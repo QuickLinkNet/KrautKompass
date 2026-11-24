@@ -1,0 +1,64 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * KrautKompass-CLI
+ *   php bin/console migrate                 Verzeichnisse + Datenbank vorbereiten
+ *   php bin/console status                  Installationsstatus anzeigen
+ *   php bin/console products:sync [--force] Katalog mit dem Shop abgleichen (für Cron)
+ *   php bin/console invite:create [admin|member] [Notiz]   Einladungscode erzeugen
+ */
+require __DIR__ . '/../src/bootstrap.php';
+
+use KrautKompass\Core\Config;
+use KrautKompass\Core\Kernel;
+use KrautKompass\Domain\Invites\InviteRepository;
+use KrautKompass\Services\Installer;
+use KrautKompass\Services\Sync\ProductSync;
+
+$kernel = (new Kernel(kk_config()))->boot();
+$c = $kernel->container;
+$command = $argv[1] ?? 'help';
+
+try {
+    switch ($command) {
+        case 'migrate':
+            echo "Datenbank ist auf dem neuesten Stand.\n";
+            break;
+
+        case 'status':
+            $installed = $c->get(Installer::class)->isInstalled();
+            echo 'Installiert: ' . ($installed ? 'ja' : 'nein (Einrichtung im Browser aufrufen)') . "\n";
+            foreach ($c->get(Installer::class)->requirements() as $req) {
+                echo ($req['ok'] ? '  ✓ ' : '  ✗ ') . $req['label'] . "\n";
+            }
+            break;
+
+        case 'products:sync':
+            $stats = $c->get(ProductSync::class)->run('cli', in_array('--force', $argv, true), static function (string $line): void {
+                echo $line . "\n";
+            });
+            unset($stats['errors']);
+            echo 'Fertig: ' . json_encode($stats, JSON_UNESCAPED_UNICODE) . "\n";
+            break;
+
+        case 'invite:create':
+            $role = in_array($argv[2] ?? '', ['admin', 'member'], true) ? $argv[2] : 'member';
+            $invite = $c->get(InviteRepository::class)->create(
+                $role,
+                $argv[3] ?? null,
+                $c->get(Config::class)->int('security.invite_valid_days'),
+                null,
+            );
+            echo "Einladungscode ($role): {$invite['code']}  gültig bis {$invite['expires_at']}\n";
+            break;
+
+        default:
+            echo "Befehle: migrate | status | products:sync [--force] | invite:create [admin|member] [Notiz]\n";
+    }
+} catch (Throwable $e) {
+    fwrite(STDERR, 'Fehler: ' . $e->getMessage() . "\n");
+    exit(1);
+}

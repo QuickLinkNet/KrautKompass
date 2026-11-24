@@ -1,0 +1,63 @@
+import type { ReactNode } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router';
+import { Button } from '../components/atoms/Button/Button';
+import { Spinner } from '../components/atoms/Spinner/Spinner';
+import { Alert } from '../components/molecules/Alert/Alert';
+import { AppLayout } from '../components/templates/AppLayout/AppLayout';
+import { AuthLayout } from '../components/templates/AuthLayout/AuthLayout';
+import { useSession } from '../features/session/sessionContext';
+import { AdminPage } from '../pages/AdminPage';
+import { LoginPage, RegisterPage, SetupPage } from '../pages/AuthPages';
+import { ProductDetailPage } from '../pages/ProductDetailPage';
+import { ProductsPage } from '../pages/ProductsPage';
+import { FeedPage, MyRatingsPage } from '../pages/RatingPages';
+
+/**
+ * Routing mit Guards:
+ *  - nicht installiert → /einrichtung
+ *  - nicht angemeldet → /login
+ *  - Admin-Bereich nur für Admins
+ */
+export function AppRoutes() {
+  const { status, user, error, refresh } = useSession();
+
+  if (!status) {
+    return error ? (
+      <AuthLayout title="Keine Verbindung">
+        <Alert>{error}</Alert>
+        <p><Button onClick={() => void refresh()}>Erneut versuchen</Button></p>
+      </AuthLayout>
+    ) : <Spinner label="KrautKompass startet …" />;
+  }
+
+  if (!status.installed) {
+    return (
+      <Routes>
+        <Route path="/einrichtung" element={<SetupPage />} />
+        <Route path="*" element={<Navigate to="/einrichtung" replace />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route path="/registrieren" element={user ? <Navigate to="/" replace /> : <RegisterPage />} />
+      <Route element={<RequireUser><AppLayout /></RequireUser>}>
+        <Route index element={<ProductsPage />} />
+        <Route path="/sorten/:id" element={<ProductDetailPage />} />
+        <Route path="/bewertungen" element={<MyRatingsPage />} />
+        <Route path="/neuigkeiten" element={<FeedPage />} />
+        <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" replace />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+function RequireUser({ children }: { children: ReactNode }) {
+  const { user } = useSession();
+  const location = useLocation();
+  if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  return <>{children}</>;
+}

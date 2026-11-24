@@ -1,0 +1,27 @@
+# Abhängigkeiten / Builds
+node_modules/
+dist/
+
+# Vite-Build landet im Webroot des Backends
+api/public/index.html
+api/public/assets/
+api/public/favicon.svg
+
+# Laufzeitdaten (werden vom Installer erzeugt)
+api/storage/*
+!api/storage/.htaccess
+!api/storage/README.md
+api/public/media/*
+!api/public/media/.gitkeep
+!api/public/media/.htaccess
+
+# Lokale Konfiguration
+api/config/local.php
+.env.local
+
+# Editor / OS
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db

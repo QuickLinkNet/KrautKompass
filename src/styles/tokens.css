@@ -1,0 +1,80 @@
+/*
+ * Design-Tokens – siehe docs/DESIGN.md.
+ * Angelehnt an den Kraut-Kurier-Shop: Jost, Navy #425C81 / #28374D, Türkis #2ACAB6, Grautöne,
+ * Logo-Grün nur als Markenfarbe. Jost wird lokal über @fontsource ausgeliefert (DSGVO).
+ * Neue Screens verwenden ausschließlich diese Variablen.
+ */
+
+:root {
+  /* Schrift */
+  --font-base: 'Jost', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --text-display: clamp(1.875rem, 1.4rem + 1.6vw, 2.5rem);
+  --text-h1: clamp(1.75rem, 1.5rem + 0.8vw, 2rem);
+  --text-h2: 1.25rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-micro: 0.75rem;
+  --tracking-label: 0.08em;
+
+  /* Marke & Aktion */
+  --color-primary: #425c81;
+  --color-primary-dark: #28374d;
+  --color-ink: #1b2638;
+  --color-accent: #2acab6;
+  --color-accent-dark: #0e7a6c;
+  --color-brand-green: #7cb342;
+  --color-brand-green-dark: #5a8a2a;
+
+  /* Neutral */
+  --color-text: #1a1a1a;
+  --color-text-muted: #737373;
+  --color-text-on-ink: #ffffff;
+  --color-text-on-ink-muted: rgb(255 255 255 / 72%);
+  --color-border: #e4e7ec;
+  --color-surface: #ffffff;
+  --color-background: #f5f5f5;
+  --color-footer: #b2b3ad;
+
+  /* Status */
+  --color-danger: #f04438;
+  --color-danger-soft: #fef3f2;
+  --color-success: #12b76a;
+  --color-success-soft: #ecfdf3;
+  --color-info-soft: #eff4fa;
+
+  /* Form */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+  --focus-ring: 0 0 0 3px rgb(42 202 182 / 35%);
+  --control-height: 46px;
+
+  /* Raum (8-px-Raster) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 10%);
+  --shadow-raised: 0 8px 24px rgb(16 24 40 / 12%);
+
+  /* Bewegung */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+
+  --content-width: 1180px;
+  --header-height: 64px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+  }
+}

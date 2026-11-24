@@ -1,0 +1,52 @@
+# KrautKompass – Apache-Konfiguration für den Webroot (api/public)
+
+Options -Indexes
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # HTTPS erzwingen (auskommentieren, falls der Hoster das schon macht)
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # API → PHP-Front-Controller
+    RewriteRule ^api(/.*)?$ index.php [L,QSA]
+
+    # Vorhandene Dateien (Assets, Bilder) direkt ausliefern
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Alles andere → Single-Page-App
+    RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "same-origin"
+    Header always set X-Frame-Options "DENY"
+    Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+    # Content-Security-Policy für die App: nur eigene Ressourcen, keine Inline-Skripte,
+    # keine Fremd-Hosts (Schrift und Bilder liegen lokal). Die API setzt ihre eigene, strengere.
+    <If "%{REQUEST_URI} !~ m#^/api(/|$)#">
+        Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    </If>
+    # Nur gehashte Build-Dateien dürfen "ewig" gecacht werden, Produktbilder einen Tag.
+    <If "%{REQUEST_URI} =~ m#^/assets/#">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </If>
+    <If "%{REQUEST_URI} =~ m#^/media/#">
+        Header set Cache-Control "public, max-age=86400"
+    </If>
+    <FilesMatch "index\.html$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>
+
+# Keine versteckten Dateien ausliefern
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

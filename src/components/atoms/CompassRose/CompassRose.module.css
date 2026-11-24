@@ -1,0 +1,84 @@
+.rose {
+  display: block;
+  color: var(--color-accent);
+}
+
+.ring,
+.ringFaint,
+.tick,
+.tickLong {
+  fill: none;
+  stroke: currentColor;
+}
+
+.ring {
+  stroke-width: 1.5;
+  opacity: 0.5;
+}
+
+.ringFaint {
+  stroke-width: 1;
+  opacity: 0.22;
+}
+
+.tick {
+  stroke-width: 1;
+  opacity: 0.35;
+}
+
+.tickLong {
+  stroke-width: 2;
+  opacity: 0.7;
+}
+
+.cardinal {
+  fill: currentColor;
+  font-family: var(--font-base);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  opacity: 0.75;
+}
+
+.needle {
+  transform-origin: 200px 200px;
+  transform: rotate(18deg);
+  animation: settle 1.6s var(--ease-out) both;
+}
+
+.needleNorth {
+  fill: currentColor;
+  opacity: 0.9;
+}
+
+.needleSouth {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  opacity: 0.5;
+}
+
+.pivot {
+  fill: var(--color-ink);
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* Nadel pendelt beim Laden kurz ein – bei reduzierter Bewegung ohne Animation */
+@keyframes settle {
+  0% {
+    transform: rotate(-40deg);
+  }
+  60% {
+    transform: rotate(28deg);
+  }
+  100% {
+    transform: rotate(18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .needle {
+    animation: none;
+  }
+}
