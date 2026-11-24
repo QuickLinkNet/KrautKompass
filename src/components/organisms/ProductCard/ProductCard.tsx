@@ -1,38 +1,86 @@
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import type { Product } from '../../../api/types';
-import { formatStars } from '../../../utils/format';
+import { effectIcon } from '../../../features/catalog/catalogQuery';
+import { formatPercent } from '../../../utils/format';
 import { Badge } from '../../atoms/Badge/Badge';
-import { StatBar } from '../../molecules/StatBar/StatBar';
+import { Icon } from '../../atoms/Icon/Icon';
+import { IconButton } from '../../atoms/IconButton/IconButton';
+import { RatingStars } from '../../atoms/RatingStars/RatingStars';
 import styles from './ProductCard.module.css';
 
-/** Produktkachel im Stil der Shop-Übersicht, ergänzt um die Gruppenbewertung. */
-export function ProductCard({ product }: { product: Product }) {
+export type CardView = 'list' | 'grid';
+
+interface ProductCardProps {
+  product: Product;
+  view?: CardView;
+  effectLabel: (key: string) => string;
+  onToggleFavorite: (product: Product) => void;
+}
+
+/**
+ * Produktkarte des Sortenkatalogs (Screendesign „Produktkarte“). Der Name ist der Link,
+ * seine Fläche deckt die ganze Karte ab; Merken-Button und Pfeil liegen darüber.
+ */
+export function ProductCard({ product, view = 'list', effectLabel, onToggleFavorite }: ProductCardProps) {
+  const href = `/sorten/${product.id}`;
+  const { search } = useLocation();
+  const effects = product.topEffects ?? [];
   return (
-    <Link to={`/sorten/${product.id}`} className={styles.card}>
-      <div className={styles.imageWrap}>
-        {product.available && <span className={styles.availability}>● lieferbar</span>}
+    <article className={`${styles.card} ${styles[view]}`}>
+      <div className={styles.media}>
         {product.thumbUrl ? (
-          <img src={product.thumbUrl} alt="" loading="lazy" className={styles.image} />
+          <img src={product.thumbUrl} alt="" loading="lazy" decoding="async" className={styles.image} />
         ) : (
-          <div className={styles.placeholder} aria-hidden="true">🌿</div>
+          <Icon name="leaf" size={24} className={styles.placeholder} />
         )}
       </div>
+
       <div className={styles.body}>
-        <h2 className={styles.name}>{product.name}</h2>
-        <p className={styles.meta}>{product.producer}</p>
-        <p className={styles.meta}>{product.strain}</p>
-        <div className={styles.badges}>
-          {product.genetic && <Badge tone="primary">{product.dominance ? `${product.dominance} dominant` : product.genetic}</Badge>}
+        <div className={styles.head}>
+          <h2 className={styles.name}>
+            <Link to={href} state={{ catalog: search }} className={styles.link}>{product.name}</Link>
+          </h2>
+          <div className={styles.rating}>
+            <RatingStars value={product.rating.average} count={product.rating.average === null ? undefined : product.rating.count} />
+          </div>
         </div>
-        <p className={styles.rating}>
-          <strong>{formatStars(product.rating.average)}</strong>
-          {product.rating.count > 0 && <span> · {product.rating.count}×</span>}
-        </p>
-        <div className={styles.stats}>
-          <StatBar label="THC" value={product.thc} />
-          <StatBar label="CBD" value={product.cbd} max={20} tone="warm" />
+        {product.producer && (
+          <p className={styles.producer}>
+            <Icon name="leaf" size={14} />
+            {product.producer}
+          </p>
+        )}
+        <div className={`${styles.tags} ${styles.metrics}`}>
+          <Badge tone="metric">THC {formatPercent(product.thc)}</Badge>
+          <Badge tone="metric">CBD {formatPercent(product.cbd)}</Badge>
+          {!product.available && <span className={styles.unavailable}>derzeit nicht lieferbar</span>}
         </div>
+        {product.terpenes.length > 0 && (
+          <div className={`${styles.tags} ${styles.terpenes}`}>
+            {product.terpenes.slice(0, 3).map((t) => <Badge key={t} tone="plain">{t}</Badge>)}
+          </div>
+        )}
+        {effects.length > 0 && (
+          <div className={`${styles.tags} ${styles.effects}`}>
+            {effects.map((e) => <Badge key={e} tone="effect" icon={effectIcon(e)}>{effectLabel(e)}</Badge>)}
+          </div>
+        )}
       </div>
-    </Link>
+
+      <div className={styles.actions}>
+        <IconButton
+          icon="heart"
+          filled={product.favorite}
+          aria-pressed={product.favorite}
+          label={product.favorite ? `${product.name} von der Merkliste nehmen` : `${product.name} auf die Merkliste`}
+          onClick={() => onToggleFavorite(product)}
+          className={`${styles.favorite} ${product.favorite ? styles.favored : ''}`}
+        />
+        <span className={styles.details} aria-hidden="true">
+          <span className={styles.detailsText}>Details ansehen</span>
+          <Icon name="arrowRight" size={18} />
+        </span>
+      </div>
+    </article>
   );
 }

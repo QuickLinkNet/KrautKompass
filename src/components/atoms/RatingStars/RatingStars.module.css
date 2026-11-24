@@ -1,0 +1,43 @@
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-small);
+  white-space: nowrap;
+}
+
+.stars {
+  position: relative;
+  display: inline-flex;
+  color: var(--color-gold);
+}
+
+.track,
+.fill {
+  display: inline-flex;
+  gap: 1px;
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+}
+
+.star {
+  color: var(--color-gold);
+}
+
+.value {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.count {
+  color: var(--color-text-muted);
+}
+
+.empty {
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}

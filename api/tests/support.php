@@ -34,12 +34,18 @@ function assert_throws(callable $fn, string $exceptionClass, string $message = '
     throw new RuntimeException("$message Keine $exceptionClass geworfen.");
 }
 
-/** Kernel mit frischem, temporärem Storage (eigene SQLite-Datei pro Test). */
-function test_kernel(): Kernel
+/**
+ * Kernel mit frischem, temporärem Storage (eigene SQLite-Datei pro Test).
+ * @param array<string, mixed> $overrides zusätzliche Konfiguration
+ */
+function test_kernel(array $overrides = []): Kernel
 {
     $dir = sys_get_temp_dir() . '/kk-test-' . bin2hex(random_bytes(4));
     $config = array_replace_recursive(kk_config(), [
-        'app' => ['debug' => true],
+        // Unabhängig von einer lokalen config/local.php: kein Mailversand, keine öffentliche URL
+        'app' => ['debug' => true, 'url' => null],
+        'mail' => ['transport' => 'none'],
+        'admin' => ['email' => null, 'password' => null],
         'paths' => [
             'storage' => $dir,
             'database' => $dir . '/test.sqlite',
@@ -48,7 +54,7 @@ function test_kernel(): Kernel
             'media' => $dir . '/media',
         ],
         'sync' => ['request_delay_ms' => 0],
-    ]);
+    ], $overrides);
     $kernel = new Kernel($config);
     $GLOBALS['kk_test_configs'][spl_object_id($kernel)] = $config;
     return $kernel;
@@ -81,10 +87,13 @@ function api(Kernel $kernel, string $method, string $path, ?array $body = null, 
     return ['status' => $response->status, 'json' => json_decode($response->body, true)];
 }
 
-/** Richtet eine frische Instanz mit Admin ein und legt eine Sorte an. */
-function installed_kernel(): array
+/**
+ * Richtet eine frische Instanz mit Admin ein und legt eine Sorte an.
+ * @param array<string, mixed> $overrides
+ */
+function installed_kernel(array $overrides = []): array
 {
-    $k = test_kernel();
+    $k = test_kernel($overrides);
     $res = api($k, 'POST', '/api/system/install', [
         'instance_name' => 'Test', 'display_name' => 'Carsten', 'email' => 'admin@test.de', 'password' => 'geheim-geheim',
     ]);

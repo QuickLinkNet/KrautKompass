@@ -27,6 +27,10 @@ export interface SystemStatus {
   csrfToken: string;
   user: User | null;
   requirements?: Requirement[];
+  /** Optionale Funktionen, abhängig von der Server-Konfiguration */
+  features?: { passwordReset: boolean };
+  /** Nur gesetzt, wenn in der Server-Konfiguration hinterlegt */
+  legal?: { imprintUrl?: string; privacyUrl?: string };
 }
 
 export interface Product {
@@ -47,6 +51,10 @@ export interface Product {
   imageUrl: string | null;
   thumbUrl: string | null;
   rating: { average: number | null; count: number };
+  /** Auf der eigenen Merkliste */
+  favorite: boolean;
+  /** Häufigste Wirkungen laut Gruppenbewertungen (nur in der Liste) */
+  topEffects?: string[];
 }
 
 export interface ProductDetails extends Product {
@@ -108,6 +116,9 @@ export interface Facets {
   producers: string[];
   genetics: string[];
   terpenes: string[];
+  /** Obergrenzen für die Schieberegler (aufgerundet, in %) */
+  thcMax: number;
+  cbdMax: number;
 }
 
 export interface Paginated<T> {

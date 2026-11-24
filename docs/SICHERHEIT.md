@@ -16,7 +16,9 @@ Stand der Härtung. Jede Maßnahme ist mit Tests abgedeckt (`api/tests/Hardening
 | Session-Cookie | `HttpOnly`, `SameSite=Lax`, `Secure` unter HTTPS, strict mode, eigener Speicherort |
 | Session-Fixation | neue Session-ID nach jedem Login |
 | Sitzungen beenden | Session-Version pro Benutzer: Passwortwechsel meldet alle anderen Geräte ab, Deaktivierung oder Rollenwechsel wirken sofort |
+| Erster Admin | aus `api/.env` (`ADMIN_EMAIL`/`ADMIN_PASSWORD`); solange vorgegeben, ist die Browser-Einrichtung gesperrt (403) – kein Wettlauf um den Admin nach dem Deploy. Passwort nach dem ersten Login aus der `.env` löschen |
 | Letzter Admin | kann weder herabgestuft noch deaktiviert werden (transaktional geprüft) |
+| Passwort-Reset | nur mit konfiguriertem Mailversand + `app.url` (sonst 503 und im Frontend als „nicht eingerichtet“ erklärt); Token 256 Bit, in der DB nur SHA-256, 60 Min. gültig, einmalig, ältere Tokens verfallen; immer gleiche Antwort (keine Konto-Erkennung); 5/15 Min. pro IP und 3/h pro Adresse; danach werden alle Sitzungen beendet; Link-Adresse nie aus dem Host-Header; Token wird im Browser sofort aus der Adresszeile entfernt |
 
 ## Requests
 
@@ -49,11 +51,16 @@ Stand der Härtung. Jede Maßnahme ist mit Tests abgedeckt (`api/tests/Hardening
 
 ## Server-Layout
 
-Document Root ist `api/public`. `src/`, `config/`, `database/`, `routes/`, `bin/` und `storage/`
-liegen außerhalb und haben zusätzlich je eine `Require all denied`-`.htaccess`.
+Document Root ist `public/` (auf dem Server `/html/apps/krautkompass/public`). `src/`, `config/`, `database/`,
+`routes/`, `bin/`, `storage/` und `.env` liegen außerhalb und haben zusätzlich je eine `Require all denied`-`.htaccess`.
+Zeigt die Subdomain doch auf den App-Ordner, leitet dessen `.htaccess` alles nach `public/` um.
+Das Deploy-Skript lädt nur das geprüfte Paket `deploy/` hoch (bricht bei `.env`, `local.php` oder Datenbank darin ab)
+und fasst `storage/`, `public/media/` und `.env` auf dem Server nie an.
 
 ## Bewusst offen / nächste Schritte
 
-- Passwort-vergessen-Funktion (braucht Mailversand) bzw. Passwort-Reset durch einen Admin – fehlt noch
+- Passwort-Reset durch einen Admin (Fallback, wenn kein Mailversand eingerichtet ist) – fehlt noch
+- Mailversand per SMTP mit Authentifizierung (aktuell PHP `mail()` des Webspaces) – bei schlechter Zustellbarkeit nachrüsten
+- Leichter Timing-Unterschied beim Reset-Antrag (Mail wird nur bei existierendem Konto erzeugt); durch Rate-Limits abgeschwächt
 - Zwei-Faktor-Login, falls die Runde über Freunde hinaus wächst
 - Backups: `api/storage/database.sqlite` regelmäßig sichern (z. B. per Cron mit `sqlite3 .backup`)

@@ -1,21 +1,24 @@
+import logoUrl from '../../../../design/assets/logo.svg';
+import logoWhiteUrl from '../../../../design/assets/logo-white.svg';
 import styles from './Logo.module.css';
 
 interface LogoProps {
-  size?: 'md' | 'lg';
-  /** light = auf dunklen Markenflächen (Ink) */
+  size?: 'sm' | 'md' | 'lg';
+  /** light = weiße Variante für Fotos und dunkle Flächen */
   tone?: 'default' | 'light';
+  className?: string;
 }
 
-/** Wortmarke in Anlehnung an „Kraut Kurier“: zweifarbig, Kompassnadel als Trenner. */
-export function Logo({ size = 'md', tone = 'default' }: LogoProps) {
+/** Wort-Bild-Marke aus dem Design-Kit (design/assets/logo*.svg, Seitenverhältnis 609:90). */
+export function Logo({ size = 'md', tone = 'default', className }: LogoProps) {
   return (
-    <span className={`${styles.logo} ${styles[size]} ${styles[tone]}`} role="img" aria-label="KrautKompass">
-      <span className={styles.kraut}>Kraut</span>
-      <svg className={styles.needle} viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M12 3.5l2.6 8.5L12 20.5 9.4 12z" fill="currentColor" />
-      </svg>
-      <span className={styles.kompass}>Kompass</span>
-    </span>
+    <img
+      src={tone === 'light' ? logoWhiteUrl : logoUrl}
+      alt="KrautKompass"
+      width={609}
+      height={90}
+      className={[styles.logo, styles[size], className].filter(Boolean).join(' ')}
+      decoding="async"
+    />
   );
 }

@@ -87,6 +87,42 @@ final class Installer
         });
     }
 
+    /** Ist der erste Admin über die Server-Konfiguration (.env) vorgegeben? */
+    public function adminFromConfig(): bool
+    {
+        return (string) $this->config->get('admin.email', '') !== '';
+    }
+
+    /**
+     * Legt den Admin aus der Server-Konfiguration an, falls noch niemand eingerichtet ist.
+     * @return string|null Fehlerbeschreibung, wenn die Vorgabe unbrauchbar ist
+     */
+    public function bootstrapAdmin(): ?string
+    {
+        if (!$this->adminFromConfig() || $this->isInstalled()) {
+            return null;
+        }
+        $email = strtolower(trim((string) $this->config->get('admin.email')));
+        $password = (string) $this->config->get('admin.password', '');
+        $min = $this->config->int('security.password_min_length');
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            return 'ADMIN_EMAIL in der .env ist keine gültige E-Mail-Adresse.';
+        }
+        if (mb_strlen($password) < $min) {
+            return "ADMIN_PASSWORD in der .env fehlt oder hat weniger als $min Zeichen.";
+        }
+        try {
+            $this->install([
+                'email' => $email,
+                'display_name' => mb_substr(trim((string) $this->config->get('admin.name', 'Admin')), 0, 40) ?: 'Admin',
+                'password' => $password,
+            ], (string) $this->config->get('admin.instance_name', $this->config->string('app.name')));
+        } catch (HttpException $e) {
+            // Parallel schon eingerichtet – nichts zu tun.
+        }
+        return null;
+    }
+
     /** @return list<array{key: string, label: string, ok: bool}> */
     public function requirements(): array
     {

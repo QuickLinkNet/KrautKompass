@@ -1,0 +1,68 @@
+.sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: 88dvh;
+  margin: auto auto 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+}
+
+.sheet[open] {
+  animation: slide-up var(--duration-base) var(--ease-out);
+}
+
+.sheet::backdrop {
+  background: var(--color-scrim-soft);
+}
+
+/* Innerer Rahmen, damit Klicks auf den Rand nicht als „Hintergrund“ zählen */
+.inner {
+  display: flex;
+  flex-direction: column;
+  max-height: 88dvh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-h2);
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-5);
+}
+
+.footer {
+  padding: var(--space-3) var(--space-5) calc(var(--space-3) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+@media (min-width: 768px) {
+  .sheet {
+    margin: auto;
+    border-radius: var(--radius-lg);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}

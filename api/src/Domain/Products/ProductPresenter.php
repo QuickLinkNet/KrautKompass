@@ -42,6 +42,7 @@ final class ProductPresenter
                 'average' => $row['avg_overall'] === null ? null : (float) $row['avg_overall'],
                 'count' => (int) ($row['rating_count'] ?? 0),
             ],
+            'favorite' => (bool) ($row['is_favorite'] ?? false),
         ];
         if ($withDetails) {
             $data += [

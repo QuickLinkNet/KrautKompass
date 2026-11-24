@@ -24,9 +24,9 @@ final class SettingsRepository
 
     public function set(string $key, string $value): void
     {
+        // INSERT OR REPLACE statt Upsert: der Webspace hat SQLite 3.7 (Upsert erst ab 3.24)
         $this->db->run(
-            'INSERT INTO settings (key, value, updated_at) VALUES (:key, :value, :now)
-             ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at',
+            'INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES (:key, :value, :now)',
             ['key' => $key, 'value' => $value, 'now' => Clock::now()],
         );
     }

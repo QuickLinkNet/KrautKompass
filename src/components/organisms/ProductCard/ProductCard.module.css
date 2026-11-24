@@ -1,87 +1,301 @@
 .card {
-  display: flex;
-  flex-direction: column;
-  background: var(--color-surface);
+  position: relative;
+  display: grid;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-3);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: inherit;
-  text-decoration: none;
-  transition: box-shadow 0.15s, transform 0.15s;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--duration-base) var(--ease-out), border-color var(--duration-base);
 }
 
 .card:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
   box-shadow: var(--shadow-raised);
-  transform: translateY(-2px);
 }
 
-.imageWrap {
-  position: relative;
-  aspect-ratio: 1;
-  padding: var(--space-4);
-}
-
-.image,
-.placeholder {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.placeholder {
+/* ---- Bild ---- */
+.media {
   display: grid;
   place-items: center;
-  font-size: 3rem;
-  background: var(--color-background);
-}
-
-.availability {
-  position: absolute;
-  top: var(--space-3);
-  left: var(--space-3);
-  padding: 2px 8px;
-  background: var(--color-success-soft);
-  color: #067647;
-  font-size: 0.75rem;
+  overflow: hidden;
+  aspect-ratio: 1;
   border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
 }
 
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  color: var(--color-secondary);
+}
+
+/* ---- Inhalt ---- */
 .body {
-  flex: 1;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.head {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 0 var(--space-4) var(--space-4);
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px var(--space-3);
 }
 
 .name {
-  margin: 0 0 var(--space-1);
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.meta {
   margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* Der Link deckt die ganze Karte ab */
+.link {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--radius-md);
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.link:focus-visible::after {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.producer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: var(--text-micro);
   color: var(--color-text-muted);
-  font-size: 0.9rem;
 }
 
-.badges {
-  margin: var(--space-2) 0;
+.producer svg {
+  color: var(--color-secondary);
 }
 
-.rating {
-  margin: auto 0 var(--space-2);
-  font-size: 0.9rem;
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.unavailable {
+  font-size: var(--text-micro);
+  color: var(--color-text-muted);
+}
+
+/* ---- Aktionen ---- */
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.favorite {
+  position: relative;
+  z-index: 1;
+  margin: -6px -6px 0 0;
+}
+
+.favored {
   color: var(--color-primary);
 }
 
-.rating span {
-  color: var(--color-text-muted);
+.details {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--text-small);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color var(--duration-fast);
 }
 
-.stats {
-  display: flex;
-  gap: var(--space-4);
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--color-border);
+.card:hover .details {
+  background: var(--color-primary-hover);
+}
+
+/* ---- Listenansicht ---- */
+.list {
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.list .terpenes,
+.list .details {
+  display: none;
+}
+
+/* ---- Kachelansicht ---- */
+.grid {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+}
+
+.grid .media {
+  aspect-ratio: 4 / 3;
+}
+
+.grid .actions {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+}
+
+.grid .favorite {
+  margin: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-background) 88%, transparent);
+}
+
+.grid .details,
+.grid .terpenes {
+  display: none;
+}
+
+/* Tablet: Pfeil im Kreis wie im Screendesign */
+@media (min-width: 768px) {
+  .card {
+    padding: var(--space-4);
+  }
+
+  .list {
+    grid-template-columns: 112px minmax(0, 1fr) auto;
+  }
+
+  .list .terpenes {
+    display: flex;
+  }
+
+  .list .details {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    min-height: 0;
+    padding: 0;
+    border: 1px solid var(--color-border-control);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-primary);
+  }
+
+  .card.list:hover .details {
+    background: var(--color-surface-alt);
+  }
+
+  .detailsText {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+
+/* Desktop: Button „Details ansehen“ */
+@media (min-width: 1024px) {
+  .list {
+    grid-template-columns: 128px minmax(0, 1fr) auto;
+  }
+
+  .list .details {
+    width: auto;
+    height: auto;
+    min-height: 40px;
+    padding: 0 var(--space-4);
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .card.list:hover .details {
+    background: var(--color-primary-hover);
+  }
+
+  .detailsText {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .name {
+    font-size: 1.25rem;
+  }
+}
+
+/* Handy, Listenansicht: Name/Hersteller/Werte neben dem Bild, Wirkungen über die volle Breite */
+@media (max-width: 767.98px) {
+  .list {
+    grid-template-columns: 84px minmax(0, 1fr) auto;
+    row-gap: 6px;
+  }
+
+  .list .body {
+    display: contents;
+  }
+
+  .list .media {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    align-self: start;
+  }
+
+  .list .head {
+    grid-column: 2;
+  }
+
+  /* unter dem Herz ist Platz: bis zum rechten Rand */
+  .list .producer,
+  .list .metrics {
+    grid-column: 2 / -1;
+  }
+
+  .list .effects {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+  }
+
+  .list .actions {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .list .name {
+    font-size: 1.0625rem;
+  }
 }

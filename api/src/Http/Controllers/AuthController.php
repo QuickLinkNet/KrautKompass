@@ -15,6 +15,7 @@ use KrautKompass\Domain\Invites\InviteRepository;
 use KrautKompass\Domain\Users\UserRepository;
 use KrautKompass\Services\Auth;
 use KrautKompass\Services\PasswordHasher;
+use KrautKompass\Services\PasswordReset;
 use KrautKompass\Services\RateLimiter;
 
 final class AuthController extends Controller
@@ -27,6 +28,7 @@ final class AuthController extends Controller
         private readonly UserRepository $users,
         private readonly PasswordHasher $hasher,
         private readonly RateLimiter $limiter,
+        private readonly PasswordReset $passwordReset,
     ) {
     }
 
@@ -74,6 +76,25 @@ final class AuthController extends Controller
         /** @var array{email: string, display_name: string, password: string, invite_code: string} $input */
         $user = $this->auth->register($input, $request->ip);
         return $this->json(['user' => $user, 'csrfToken' => $this->session->csrfToken()], 201);
+    }
+
+    /** Schickt einen Reset-Link; die Antwort verrät nie, ob die Adresse registriert ist. */
+    public function forgotPassword(Request $request): Response
+    {
+        $input = Validator::validate($request->json(), ['email' => 'required|email|max:120']);
+        $this->passwordReset->request((string) $input['email'], $request->ip);
+        return $this->json(['sent' => true], 202);
+    }
+
+    public function resetPassword(Request $request): Response
+    {
+        $min = $this->config->int('security.password_min_length');
+        $input = Validator::validate($request->json(), [
+            'token' => 'required|string|max:128',
+            'password' => "required|raw|string|min:$min|max:200",
+        ]);
+        $this->passwordReset->reset((string) $input['token'], (string) $input['password'], $request->ip);
+        return $this->json(['reset' => true]);
     }
 
     public function updateProfile(Request $request): Response

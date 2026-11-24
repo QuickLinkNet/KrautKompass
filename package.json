@@ -11,10 +11,14 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:api": "php api/tests/run.php",
-    "check": "npm run typecheck && npm test && npm run test:api"
+    "check": "npm run typecheck && npm test && npm run test:api",
+    "deploy:prepare": "node scripts/prepare-deploy.mjs",
+    "predeploy": "npm run check && npm run build && npm run deploy:prepare",
+    "deploy": "node scripts/deploy.mjs"
   },
   "dependencies": {
-    "@fontsource/jost": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/playfair-display": "^5.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router": "^7.18.6"
@@ -24,6 +28,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
+    "basic-ftp": "^5.3.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
     "vitest": "^5.1.1"

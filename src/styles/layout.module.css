@@ -5,6 +5,32 @@
   gap: var(--space-4);
 }
 
+/* Auth-Formulare: etwas mehr Luft zwischen den Feldern (Referenz-Screendesign) */
+.formAuth {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.centerLink {
+  justify-self: center;
+  font-size: var(--text-small);
+  font-weight: 500;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-self: start;
+  font-size: var(--text-small);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;

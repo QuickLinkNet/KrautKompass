@@ -1,0 +1,116 @@
+.toolbar {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* Handy: [Filter] [Sortierung] / Treffer darunter */
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'filter sort'
+    'count count';
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.filterButton {
+  grid-area: filter;
+  min-height: 44px;
+}
+
+.count {
+  grid-area: count;
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.sort {
+  grid-area: sort;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.sortLabel,
+.wide {
+  display: none;
+}
+
+.sort .sortSelect {
+  width: auto;
+  max-width: 100%;
+  min-height: 44px;
+}
+
+.views {
+  display: none;
+  grid-area: views;
+  gap: 2px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.reset {
+  min-height: 32px;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--text-small);
+  font-weight: 500;
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.reset:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Tablet: alles in einer Zeile, Ansicht umschaltbar */
+@media (min-width: 768px) {
+  .row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'filter sort views'
+      'count count count';
+  }
+
+  .sortLabel {
+    display: inline;
+  }
+
+  .views {
+    display: flex;
+  }
+}
+
+/* Desktop: Filter stehen in der Seitenleiste */
+@media (min-width: 1024px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: 'count sort views';
+  }
+
+  .filterButton {
+    display: none;
+  }
+
+  .wide {
+    display: inline;
+  }
+}

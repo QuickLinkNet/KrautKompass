@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
 import { productApi } from '../api/endpoints';
 import { Badge } from '../components/atoms/Badge/Badge';
 import { Card } from '../components/atoms/Card/Card';
@@ -15,6 +15,9 @@ import styles from './ProductDetailPage.module.css';
 
 export function ProductDetailPage() {
   const id = Number(useParams().id);
+  // Zurück zum Katalog mit den Filtern, mit denen man gekommen ist
+  const catalog = (useLocation().state as { catalog?: unknown } | null)?.catalog;
+  const fromCatalog = typeof catalog === 'string' && catalog.startsWith('?') ? catalog : '';
   const meta = useMeta();
   const detail = useAsyncResource(() => productApi.show(id), [id]);
 
@@ -33,7 +36,7 @@ export function ProductDetailPage() {
 
   return (
     <div className={layout.stack}>
-      <Link to="/" className={layout.muted}>← Alle Sorten</Link>
+      <Link to={`/${fromCatalog}`} className={layout.muted}>← Alle Sorten</Link>
       <div className={styles.top}>
         <div className={styles.image}>
           {product.imageUrl ? <img src={product.imageUrl} alt={product.name} /> : <span aria-hidden="true">🌿</span>}

@@ -3,11 +3,11 @@ import { Navigate, Route, Routes, useLocation } from 'react-router';
 import { Button } from '../components/atoms/Button/Button';
 import { Spinner } from '../components/atoms/Spinner/Spinner';
 import { Alert } from '../components/molecules/Alert/Alert';
-import { AppLayout } from '../components/templates/AppLayout/AppLayout';
+import { AppLayout, PageContainer } from '../components/templates/AppLayout/AppLayout';
 import { AuthLayout } from '../components/templates/AuthLayout/AuthLayout';
 import { useSession } from '../features/session/sessionContext';
 import { AdminPage } from '../pages/AdminPage';
-import { LoginPage, RegisterPage, SetupPage } from '../pages/AuthPages';
+import { ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage, SetupPage } from '../pages/AuthPages';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { ProductsPage } from '../pages/ProductsPage';
 import { FeedPage, MyRatingsPage } from '../pages/RatingPages';
@@ -15,7 +15,7 @@ import { FeedPage, MyRatingsPage } from '../pages/RatingPages';
 /**
  * Routing mit Guards:
  *  - nicht installiert → /einrichtung
- *  - nicht angemeldet → /login
+ *  - nicht angemeldet → /login (Registrierung und Passwort-Reset bleiben erreichbar)
  *  - Admin-Bereich nur für Admins
  */
 export function AppRoutes() {
@@ -43,12 +43,18 @@ export function AppRoutes() {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
       <Route path="/registrieren" element={user ? <Navigate to="/" replace /> : <RegisterPage />} />
+      <Route path="/passwort-vergessen" element={user ? <Navigate to="/" replace /> : <ForgotPasswordPage />} />
+      {/* Bewusst auch angemeldet erreichbar: der Link aus der Mail soll immer funktionieren */}
+      <Route path="/passwort-neu" element={<ResetPasswordPage />} />
       <Route element={<RequireUser><AppLayout /></RequireUser>}>
+        {/* Startseite: Sortenkatalog mit eigener Vollbreite (Kopfband) */}
         <Route index element={<ProductsPage />} />
-        <Route path="/sorten/:id" element={<ProductDetailPage />} />
-        <Route path="/bewertungen" element={<MyRatingsPage />} />
-        <Route path="/neuigkeiten" element={<FeedPage />} />
-        <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" replace />} />
+        <Route element={<PageContainer />}>
+          <Route path="/sorten/:id" element={<ProductDetailPage />} />
+          <Route path="/bewertungen" element={<MyRatingsPage />} />
+          <Route path="/neuigkeiten" element={<FeedPage />} />
+          <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" replace />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

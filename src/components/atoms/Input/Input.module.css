@@ -1,27 +1,81 @@
 .control {
   width: 100%;
   min-height: var(--control-height);
-  padding: 0 var(--space-3);
-  border: 1px solid var(--color-border);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border-control);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   font: inherit;
+  font-size: var(--text-body);
   color: var(--color-text);
   transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+select.control {
+  -webkit-appearance: auto;
+  appearance: auto;
+}
+
+.control::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.85;
+}
+
+.control:hover:not(:focus) {
+  border-color: var(--color-border-strong);
 }
 
 .control:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-focus);
   outline: none;
   box-shadow: var(--focus-ring);
 }
 
 .textarea {
   min-height: 110px;
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   resize: vertical;
 }
 
-.invalid {
+.invalid,
+.invalid:hover:not(:focus) {
   border-color: var(--color-danger);
+}
+
+.invalid:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px var(--color-danger-soft);
+}
+
+/* Feld mit Icon und/oder Bedienelement */
+.group {
+  position: relative;
+  display: block;
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.withIcon {
+  padding-left: 46px;
+}
+
+.withTrailing {
+  padding-right: 52px;
+}
+
+.trailing {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  display: flex;
 }

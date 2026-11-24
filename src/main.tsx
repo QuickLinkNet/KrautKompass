@@ -1,8 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import '@fontsource/jost/400.css';
-import '@fontsource/jost/500.css';
-import '@fontsource/jost/600.css';
+// Schriften lokal ausgeliefert (keine externen Font-Requests, DSGVO): variable Fonts, je eine Datei pro Schriftsystem
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/playfair-display/wght.css';
 import './styles/global.css';
 import { App } from './App';
 

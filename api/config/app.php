@@ -3,15 +3,42 @@
 declare(strict_types=1);
 
 /**
- * Standard-Konfiguration. Überschreiben in config/local.php (siehe local.example.php),
- * diese Datei wird nicht eingecheckt.
+ * Standard-Konfiguration. Server-Werte kommen aus api/.env (siehe .env.example),
+ * alles Weitere lässt sich in config/local.php überschreiben (siehe local.example.php).
+ * Beide Dateien werden nicht eingecheckt.
  */
 return [
     'app' => [
         'name' => 'KrautKompass',
         'version' => '0.1.0',
-        'debug' => false,
+        'debug' => kk_env('APP_DEBUG') === 'true',
         'timezone' => 'Europe/Berlin',
+        // Öffentliche Adresse ohne Slash am Ende, z. B. https://krautkompass.red-it.org.
+        // Wird für Links in E-Mails gebraucht (nie aus dem Host-Header abgeleitet).
+        'url' => kk_env('APP_URL'),
+    ],
+
+    // Erster Admin: wird beim ersten Aufruf angelegt, solange es noch keinen gibt.
+    // Ist er gesetzt, ist der Einrichtungsassistent im Browser gesperrt.
+    'admin' => [
+        'email' => kk_env('ADMIN_EMAIL'),
+        'password' => kk_env('ADMIN_PASSWORD'),
+        'name' => kk_env('ADMIN_NAME', 'Admin'),
+        'instance_name' => kk_env('INSTANCE_NAME', 'KrautKompass'),
+    ],
+
+    // Optionale Rechtstexte; werden unter den Auth-Seiten verlinkt, sobald gesetzt.
+    'legal' => [
+        'imprint_url' => kk_env('IMPRINT_URL'),
+        'privacy_url' => kk_env('PRIVACY_URL'),
+    ],
+
+    // Mailversand (Passwort-Reset). Ohne Konfiguration ist der Reset deaktiviert.
+    // transport: none | mail (PHP mail()) | log (nur Entwicklung, schreibt ins Log)
+    'mail' => [
+        'transport' => kk_env('MAIL_TRANSPORT', 'none'),
+        'from' => kk_env('MAIL_FROM'),
+        'from_name' => 'KrautKompass',
     ],
 
     'paths' => [
@@ -34,6 +61,7 @@ return [
         'login_max_attempts' => 5,
         'login_window_minutes' => 15,
         'invite_valid_days' => 14,
+        'reset_valid_minutes' => 60,
         'max_body_bytes' => 65536,
         // Nur auf true setzen, wenn ein eigener Reverse-Proxy (z. B. Cloudflare) davor sitzt.
         'trust_proxy' => false,

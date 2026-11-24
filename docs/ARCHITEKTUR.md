@@ -42,8 +42,16 @@ als `{"error": {"code", "message", "details"}}` ausgeliefert. Unerwartete Fehler
    erstellt die SQLite-Datei und spielt neue Dateien aus `database/migrations/` ein.
    Ausgeführte Migrationen stehen in `schema_migrations`.
 2. **Einmalig:** Solange in `settings` kein `installed_at` steht, sperrt die Middleware `installed`
-   alle fachlichen Endpunkte (HTTP 409 `not_installed`). Das Frontend zeigt dann den Assistenten:
-   Er prüft die Voraussetzungen und legt über `POST /api/system/install` den ersten Admin an.
+   alle fachlichen Endpunkte (HTTP 409 `not_installed`).
+   - **Mit `ADMIN_EMAIL`/`ADMIN_PASSWORD` in `api/.env`** legt `Installer::bootstrapAdmin()` den Admin beim
+     nächsten `GET /api/system/status` an. Der Assistent ist dann gesperrt (403 `setup_via_env`), damit sich
+     auf einem frisch deployten Server niemand vorher zum Admin machen kann. Ungültige Werte erscheinen als
+     nicht erfüllte Voraussetzung. Spätere Änderungen an der `.env` überschreiben den Admin nicht.
+   - **Ohne Vorgabe** zeigt das Frontend den Assistenten: Er prüft die Voraussetzungen und legt über
+     `POST /api/system/install` den ersten Admin an.
+
+Konfiguration: `config/app.php` liest Server-Werte über `kk_env()` aus Umgebungsvariablen oder `api/.env`
+(Vorlage `.env.example`); `config/local.php` kann zusätzlich alles überschreiben.
 
 Schema-Änderung = neue Datei `database/migrations/JJJJ_MM_TT_NNNNNN_name.php`, die ein
 `Closure(Database): void` zurückgibt. Bestehende Migrationen nie ändern.
@@ -64,7 +72,14 @@ strikte Validierung, Schreibtransaktionen mit `BEGIN IMMEDIATE`, CSP, gehärtete
   und Nebenwirkungen als JSON-Listen aus festem Vokabular (`config/app.php` → `ratings`),
   `visibility` `private` (Standard) | `group`
 - `sync_runs`: Protokoll der Katalogabgleiche
-- `settings`, `login_attempts`
+- `password_resets`: nur SHA-256 des Tokens, Ablauf, eingelöst (siehe Sicherheit)
+- `favorites`: Merkliste je Person (`user_id`, `product_id`), nur für sie selbst sichtbar
+
+Katalogsuche (`GET /api/products`): Suche, Hersteller, Terpen, THC/CBD-Spanne, Mindestbewertung, Wirkungen
+(ODER, laut Gruppenbewertungen), verfügbar, Merkliste; Sortierung nur über eine Whitelist. Listen in
+JSON-Spalten werden per `instr()` gefiltert, Facetten und Top-Wirkungen in PHP berechnet
+(`ProductStatsRepository`) – der Webspace hat SQLite 3.7.17 ohne JSON-Funktionen.
+- `settings`, `login_attempts`, `rate_limits`
 
 ## Produkt-Sync
 
@@ -81,17 +96,22 @@ strikte Validierung, Schreibtransaktionen mit `BEGIN IMMEDIATE`, CSP, gehärtete
 
 ## Frontend
 
-- **Atomic Design:** `atoms` (Button, Input, Badge, Card, Logo, Spinner) → `molecules`
-  (FormField, Alert, StatBar, ChipGroup, ScoreInput) → `organisms` (Formulare, ProductCard,
-  Filter, Panels) → `templates` (AuthLayout, AppLayout) → `pages`
-- **Design-Tokens** in `src/styles/tokens.css`: Alle Farben, Abstände und Radien sind CSS-Variablen.
-  Screendesigns tauschen hier zentral.
+- **Atomic Design:** `atoms` (Icon, Logo, Button/ButtonLink, IconButton, Input, Choice, Divider, Badge, RatingStars,
+  Card, Spinner) → `molecules` (FormField, PasswordField, Alert, SearchField, RangeField, FilterChip, Sheet, StatBar,
+  ChipGroup, ScoreInput) → `organisms` (AppHeader, AuthHero, CatalogHero, CatalogFilters, CatalogToolbar,
+  ProductCard, Formulare, Panels) → `templates` (AuthLayout, AppLayout + PageContainer) → `pages`
+- **Sortenkatalog** (`pages/ProductsPage`, Startseite `/`): Filter stehen in der URL (`features/catalog/catalogQuery`,
+  teilbar, Zurück-Taste funktioniert), `useCatalog` lädt seitenweise und schaltet die Merkliste optimistisch um.
+  Desktop: Seitenleiste; darunter: Filter-Sheet (`<dialog>`). Auf dem Handy immer Listenansicht.
+- **Design-Tokens** in `src/styles/tokens.css`: Rohwerte aus `design/tokens.json` (per Test synchron
+  gehalten) plus semantische Tokens, die allein in Komponenten benutzt werden. Siehe [DESIGN.md](DESIGN.md).
+- **Assets** (Logos, Fotos, Favicon, App-Icon) werden direkt aus `design/assets/` importiert – eine Quelle, kein Kopieren.
 - **Daten:** `api/client.ts` (CSRF, Fehler als `ApiError` mit Feldfehlern), `api/endpoints.ts`
   (typisiert), `hooks/useAsyncResource` (Laden + Race-Schutz), `hooks/useForm` (Formular +
   422-Feldfehler)
 - **Routing-Guards** in `routes/AppRoutes.tsx`: nicht installiert → `/einrichtung`,
-  nicht angemeldet → `/login`, `/admin` nur für Admins
-- Dateien bleiben unter 200 Zeilen.
+  nicht angemeldet → `/login` (Registrierung, `/passwort-vergessen`, `/passwort-neu` bleiben offen), `/admin` nur für Admins
+- TS/PHP-Dateien bleiben unter 200 Zeilen; CSS-Module mit drei Breakpoints dürfen länger sein (Obergrenze 500).
 
 ## Neues Feature anlegen (Checkliste)
 

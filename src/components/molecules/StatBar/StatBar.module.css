@@ -23,9 +23,9 @@
 }
 
 .accent {
-  background: var(--color-accent);
+  background: var(--color-secondary);
 }
 
 .warm {
-  background: #fdb022;
+  background: var(--color-warning);
 }

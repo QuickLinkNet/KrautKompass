@@ -10,14 +10,30 @@ use KrautKompass\Support\Clock;
 /**
  * Produktkatalog inkl. Aggregat der für die Gruppe sichtbaren Bewertungen.
  * Liefert Rohzeilen; die API-Darstellung übernimmt ProductPresenter.
+ *
+ * Bewusst nur klassisches SQL (keine JSON-Funktionen, kein Upsert, kein RETURNING):
+ * der Webspace hat SQLite 3.7. Listen in JSON-Spalten werden per instr() auf '"Wert"' gefiltert.
  */
 final class ProductRepository
 {
+    /** Gruppen-Durchschnitt (nur für die Runde sichtbare Bewertungen) */
+    private const AVG_SQL = "(SELECT ROUND(AVG(r.overall), 1) FROM ratings r
+        WHERE r.product_id = p.id AND r.visibility = 'group')";
+
     private const SORTS = [
+        'popular' => 'rating_count DESC, avg_overall IS NULL, avg_overall DESC, p.name COLLATE NOCASE',
+        'rating' => 'avg_overall IS NULL, avg_overall DESC, rating_count DESC, p.name COLLATE NOCASE',
+        'thc' => 'p.thc IS NULL, p.thc DESC, p.name COLLATE NOCASE',
+        'thc_asc' => 'p.thc IS NULL, p.thc ASC, p.name COLLATE NOCASE',
+        'newest' => 'p.created_at DESC, p.id DESC',
         'name' => 'p.name COLLATE NOCASE ASC',
-        'thc' => 'p.thc DESC, p.name',
-        'rating' => 'avg_overall IS NULL, avg_overall DESC, p.name',
-        'newest' => 'p.created_at DESC',
+    ];
+
+    // Fehlende Werte zählen als 0 % (im Shop meist bei CBD unter der Nachweisgrenze).
+    // Zahlen werden als Text gebunden, daher CAST – Ausdrücke ohne Spalten-Affinität vergleichen sonst als Text.
+    private const RANGES = [
+        'thcMin' => 'COALESCE(p.thc, 0) >=', 'thcMax' => 'COALESCE(p.thc, 0) <=',
+        'cbdMin' => 'COALESCE(p.cbd, 0) >=', 'cbdMax' => 'COALESCE(p.cbd, 0) <=',
     ];
 
     public function __construct(private readonly Database $db)
@@ -26,16 +42,19 @@ final class ProductRepository
 
     /**
      * @param array{q?: ?string, producer?: ?string, genetic?: ?string, terpene?: ?string,
-     *              available?: bool, sort?: ?string} $filters
+     *              available?: bool, favorites?: bool, thcMin?: ?float, thcMax?: ?float,
+     *              cbdMin?: ?float, cbdMax?: ?float, minRating?: ?float, effects?: list<string>,
+     *              sort?: ?string} $filters
      * @return array{items: list<array<string, mixed>>, total: int}
      */
-    public function search(array $filters, int $page, int $perPage): array
+    public function search(array $filters, int $viewerId, int $page, int $perPage): array
     {
         $where = ['p.active = 1'];
         $params = [];
         if (!empty($filters['q'])) {
-            $where[] = '(p.name LIKE :q OR p.strain LIKE :q OR p.producer LIKE :q)';
-            $params['q'] = '%' . $filters['q'] . '%';
+            $like = "LIKE :q ESCAPE '!'";
+            $where[] = "(p.name $like OR p.strain $like OR p.producer $like)";
+            $params['q'] = '%' . strtr($filters['q'], ['!' => '!!', '%' => '!%', '_' => '!_']) . '%';
         }
         foreach (['producer', 'genetic'] as $field) {
             if (!empty($filters[$field])) {
@@ -44,27 +63,50 @@ final class ProductRepository
             }
         }
         if (!empty($filters['terpene'])) {
-            $where[] = 'EXISTS (SELECT 1 FROM json_each(p.terpenes) WHERE json_each.value = :terpene)';
-            $params['terpene'] = $filters['terpene'];
+            $where[] = 'instr(p.terpenes, :terpene) > 0';
+            $params['terpene'] = self::jsonNeedle($filters['terpene']);
+        }
+        foreach (self::RANGES as $key => $sql) {
+            if (isset($filters[$key])) {
+                $where[] = "$sql CAST(:$key AS REAL)";
+                $params[$key] = $filters[$key];
+            }
+        }
+        if (isset($filters['minRating'])) {
+            $where[] = self::AVG_SQL . ' >= CAST(:minRating AS REAL)';
+            $params['minRating'] = $filters['minRating'];
+        }
+        if (!empty($filters['effects'])) {
+            $any = [];
+            foreach (array_values($filters['effects']) as $i => $effect) {
+                $any[] = "instr(r.effects, :effect$i) > 0";
+                $params["effect$i"] = self::jsonNeedle($effect);
+            }
+            $where[] = "EXISTS (SELECT 1 FROM ratings r WHERE r.product_id = p.id AND r.visibility = 'group' AND ("
+                . implode(' OR ', $any) . '))';
         }
         if (!empty($filters['available'])) {
             $where[] = 'p.available = 1';
         }
+        if (!empty($filters['favorites'])) {
+            $where[] = 'EXISTS (SELECT 1 FROM favorites f WHERE f.product_id = p.id AND f.user_id = :favUser)';
+            $params['favUser'] = $viewerId;
+        }
         $whereSql = implode(' AND ', $where);
-        $order = self::SORTS[$filters['sort'] ?? 'name'] ?? self::SORTS['name'];
+        $order = self::SORTS[$filters['sort'] ?? 'popular'] ?? self::SORTS['popular'];
 
         $total = (int) $this->db->scalar("SELECT COUNT(*) FROM products p WHERE $whereSql", $params);
         $items = $this->db->all(
             $this->selectWithAggregate() . " WHERE $whereSql ORDER BY $order LIMIT :limit OFFSET :offset",
-            [...$params, 'limit' => $perPage, 'offset' => ($page - 1) * $perPage],
+            [...$params, 'viewer' => $viewerId, 'limit' => $perPage, 'offset' => ($page - 1) * $perPage],
         );
         return ['items' => $items, 'total' => $total];
     }
 
     /** @return array<string, mixed>|null */
-    public function find(int $id): ?array
+    public function find(int $id, int $viewerId = 0): ?array
     {
-        return $this->db->one($this->selectWithAggregate() . ' WHERE p.id = :id', ['id' => $id]);
+        return $this->db->one($this->selectWithAggregate() . ' WHERE p.id = :id', ['id' => $id, 'viewer' => $viewerId]);
     }
 
     /** @return array<string, mixed>|null */
@@ -112,27 +154,17 @@ final class ProductRepository
         )->rowCount();
     }
 
-    /** @return array{producers: list<string>, genetics: list<string>, terpenes: list<string>} */
-    public function facets(): array
+    private static function jsonNeedle(string $value): string
     {
-        $column = fn (string $sql): array => array_column($this->db->all($sql), 'v');
-        return [
-            'producers' => $column("SELECT DISTINCT producer AS v FROM products
-                WHERE active = 1 AND producer IS NOT NULL ORDER BY producer COLLATE NOCASE"),
-            'genetics' => $column("SELECT DISTINCT genetic AS v FROM products
-                WHERE active = 1 AND genetic IS NOT NULL ORDER BY genetic"),
-            'terpenes' => $column("SELECT DISTINCT json_each.value AS v FROM products, json_each(products.terpenes)
-                WHERE products.active = 1 ORDER BY v COLLATE NOCASE"),
-        ];
+        return (string) json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 
     private function selectWithAggregate(): string
     {
-        return "SELECT p.*,
-                (SELECT ROUND(AVG(r.overall), 1) FROM ratings r
-                    WHERE r.product_id = p.id AND r.visibility = 'group') AS avg_overall,
+        return 'SELECT p.*, ' . self::AVG_SQL . " AS avg_overall,
                 (SELECT COUNT(*) FROM ratings r
-                    WHERE r.product_id = p.id AND r.visibility = 'group') AS rating_count
+                    WHERE r.product_id = p.id AND r.visibility = 'group') AS rating_count,
+                EXISTS (SELECT 1 FROM favorites f WHERE f.product_id = p.id AND f.user_id = :viewer) AS is_favorite
             FROM products p";
     }
 }

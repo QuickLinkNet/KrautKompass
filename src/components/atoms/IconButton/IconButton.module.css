@@ -1,0 +1,49 @@
+.button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color var(--duration-fast), border-color var(--duration-fast), color var(--duration-fast);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--color-surface-alt);
+}
+
+.outline {
+  border-color: var(--color-border-control);
+  border-radius: var(--radius-pill);
+}
+
+.outline:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-surface-alt);
+}
+
+.solid {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.solid:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}

@@ -13,6 +13,7 @@ use KrautKompass\Core\Validator;
 use KrautKompass\Domain\Settings\SettingsRepository;
 use KrautKompass\Services\Auth;
 use KrautKompass\Services\Installer;
+use KrautKompass\Services\PasswordReset;
 
 /**
  * Einstieg für das Frontend: Status (installiert? angemeldet? CSRF-Token)
@@ -26,11 +27,13 @@ final class SystemController extends Controller
         private readonly SettingsRepository $settings,
         private readonly Session $session,
         private readonly Auth $auth,
+        private readonly PasswordReset $passwordReset,
     ) {
     }
 
     public function status(Request $request): Response
     {
+        $adminError = $this->installer->bootstrapAdmin();
         $installed = $this->installer->isInstalled();
         $data = [
             'app' => $this->config->string('app.name'),
@@ -39,9 +42,17 @@ final class SystemController extends Controller
             'instanceName' => $this->settings->get('instance_name', $this->config->string('app.name')),
             'csrfToken' => $this->session->csrfToken(),
             'user' => $installed ? $this->auth->currentUser() : null,
+            'features' => ['passwordReset' => $installed && $this->passwordReset->available()],
+            'legal' => (object) array_filter([
+                'imprintUrl' => $this->safeUrl('legal.imprint_url'),
+                'privacyUrl' => $this->safeUrl('legal.privacy_url'),
+            ]),
         ];
         if (!$installed) {
             $data['requirements'] = $this->installer->requirements();
+            if ($adminError !== null) {
+                $data['requirements'][] = ['key' => 'admin_env', 'label' => $adminError, 'ok' => false];
+            }
         }
         return $this->json($data);
     }
@@ -50,6 +61,10 @@ final class SystemController extends Controller
     {
         if ($this->installer->isInstalled()) {
             return Response::error(409, 'already_installed', 'KrautKompass ist bereits eingerichtet.');
+        }
+        // Schutz vor fremder Ersteinrichtung: ist der Admin in der .env vorgegeben, nur von dort
+        if ($this->installer->adminFromConfig()) {
+            return Response::error(403, 'setup_via_env', 'Der erste Admin wird über die Server-Konfiguration angelegt.');
         }
         $min = $this->config->int('security.password_min_length');
         $input = Validator::validate($request->json(), [
@@ -71,6 +86,12 @@ final class SystemController extends Controller
         ], (string) ($input['instance_name'] ?? $this->config->string('app.name')));
 
         return $this->json(['user' => $this->auth->loginById($id), 'csrfToken' => $this->session->csrfToken()], 201);
+    }
+
+    private function safeUrl(string $key): ?string
+    {
+        $url = (string) $this->config->get($key, '');
+        return preg_match('#^https://\S+$#', $url) === 1 ? $url : null;
     }
 
     /** Vokabular für Formulare: Wirkungen, Nebenwirkungen, Konsumformen, Skala. */

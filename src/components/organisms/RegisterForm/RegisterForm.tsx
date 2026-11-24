@@ -13,23 +13,29 @@ export function RegisterForm({ initialCode, onDone }: { initialCode: string; onD
   const form = useForm({ invite_code: initialCode, display_name: '', email: '', password: '' });
 
   const submit = form.handleSubmit(async (values) => {
-    const { user } = await authApi.register({ ...values, invite_code: values.invite_code.trim().toUpperCase() });
+    const { user } = await authApi.register({
+      ...values,
+      email: values.email.trim(),
+      invite_code: values.invite_code.trim().toUpperCase(),
+    });
     onDone(user);
   });
 
   return (
-    <form className={layout.form} onSubmit={submit} noValidate>
+    <form className={layout.formAuth} onSubmit={submit} noValidate aria-label="Konto anlegen">
       {form.formError && <Alert>{form.formError}</Alert>}
       <FormField label="Einladungscode" htmlFor="code" error={form.errors.invite_code}>
-        <Input id="code" placeholder="KK-XXXX-XXXX" value={form.values.invite_code}
+        <Input id="code" icon="ticket" placeholder="KK-XXXX-XXXX" autoCapitalize="characters" autoCorrect="off"
+          autoComplete="one-time-code" spellCheck={false} value={form.values.invite_code}
           onChange={(e) => form.set('invite_code', e.target.value)} invalid={!!form.errors.invite_code} />
       </FormField>
-      <FormField label="Anzeigename" htmlFor="name" error={form.errors.display_name} hint="So sehen dich die anderen.">
-        <Input id="name" autoComplete="nickname" value={form.values.display_name}
+      <FormField label="Anzeigename" htmlFor="name" error={form.errors.display_name} hint="So sehen dich die anderen in der Runde.">
+        <Input id="name" icon="user" autoComplete="nickname" value={form.values.display_name}
           onChange={(e) => form.set('display_name', e.target.value)} invalid={!!form.errors.display_name} />
       </FormField>
       <FormField label="E-Mail" htmlFor="email" error={form.errors.email}>
-        <Input id="email" type="email" inputMode="email" autoCapitalize="none" autoComplete="email" value={form.values.email}
+        <Input id="email" type="email" icon="mail" placeholder="E-Mail-Adresse" inputMode="email" autoCapitalize="none"
+          autoCorrect="off" autoComplete="email" value={form.values.email}
           onChange={(e) => form.set('email', e.target.value)} invalid={!!form.errors.email} />
       </FormField>
       <FormField label="Passwort" htmlFor="password" error={form.errors.password} hint="Mindestens 10 Zeichen.">
@@ -37,7 +43,7 @@ export function RegisterForm({ initialCode, onDone }: { initialCode: string; onD
           onChange={(e) => form.set('password', e.target.value)} invalid={!!form.errors.password} />
       </FormField>
       <Button type="submit" block loading={form.submitting}>
-        Konto anlegen
+        {form.submitting ? 'Konto wird angelegt …' : 'Konto anlegen'}
       </Button>
     </form>
   );

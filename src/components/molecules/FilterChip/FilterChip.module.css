@@ -1,0 +1,31 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 10px 4px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent) 34%, var(--color-background));
+  color: var(--color-primary);
+  font: inherit;
+  font-size: var(--text-small);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color var(--duration-fast);
+}
+
+.chip:hover {
+  background: color-mix(in srgb, var(--color-accent) 55%, var(--color-background));
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.remove {
+  opacity: 0.75;
+}

@@ -17,24 +17,43 @@ export const authApi = {
   logout: () => api.post<{ csrfToken: string }>('/auth/logout'),
   register: (data: { invite_code: string; display_name: string; email: string; password: string }) =>
     api.post<UserResponse>('/auth/register', data),
+  forgotPassword: (email: string) => api.post<{ sent: boolean }>('/auth/password/forgot', { email }),
+  resetPassword: (token: string, password: string) =>
+    api.post<{ reset: boolean }>('/auth/password/reset', { token, password }),
   checkInvite: (code: string) => api.get<{ valid: boolean; expiresAt: string }>(`/invites/${encodeURIComponent(code)}`),
   updateProfile: (data: { display_name?: string; current_password?: string; new_password?: string }) =>
     api.patch<{ user: User }>('/auth/me', data),
 };
+
+export type ProductSort = 'popular' | 'rating' | 'thc' | 'thc_asc' | 'newest' | 'name';
 
 export interface ProductQuery {
   q?: string;
   producer?: string;
   genetic?: string;
   terpene?: string;
+  thcMin?: number;
+  thcMax?: number;
+  cbdMin?: number;
+  cbdMax?: number;
+  /** Mindest-Durchschnitt (Skala 1–10) */
+  minRating?: number;
+  /** Wirkungs-Schlüssel, ODER-verknüpft */
+  effects?: string[];
   available?: boolean;
-  sort?: 'name' | 'thc' | 'rating' | 'newest';
+  favorites?: boolean;
+  sort?: ProductSort;
   page?: number;
   perPage?: number;
 }
 
 export const productApi = {
-  list: (query: ProductQuery) => api.get<Paginated<Product>>('/products', { ...query }),
+  list: ({ effects, ...query }: ProductQuery) =>
+    api.get<Paginated<Product>>('/products', { ...query, effects: effects?.length ? effects.join(',') : undefined }),
+  setFavorite: (id: number, favorite: boolean) =>
+    favorite
+      ? api.put<{ favorite: boolean }>(`/products/${id}/favorite`, {})
+      : api.delete<{ favorite: boolean }>(`/products/${id}/favorite`),
   facets: () => api.get<Facets>('/products/facets'),
   show: (id: number) =>
     api.get<{ product: ProductDetails; myRating: Rating | null; ratings: Rating[] }>(`/products/${id}`),

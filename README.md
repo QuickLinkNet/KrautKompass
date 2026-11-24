@@ -3,13 +3,15 @@
 Privates Bewertungstagebuch für Cannabissorten aus dem Sortiment von
 [Kraut Kurier](https://krautkurier.shop). Geschlossene Runde: Zugang nur per Einladung.
 
-- **Frontend** (Projekt-Root): Vite + React 19 + TypeScript, Atomic Design, CSS Modules, Schrift Jost lokal gehostet
+- **Frontend** (Projekt-Root): Vite + React 19 + TypeScript, Atomic Design, CSS Modules, Designsystem „Apothecary“ (Playfair Display + Inter lokal gehostet)
 - **API** (`api/`): PHP 8.1+ ohne Abhängigkeiten (eigenes kleines MVC), SQLite
 - **Selbstinstallierend:** Datenbank, Verzeichnisse und Migrationen entstehen beim ersten Aufruf,
-  der Admin wird über einen Einrichtungsassistenten im Browser angelegt
-- **Sortenkatalog:** automatischer Abgleich mit dem Kraut-Kurier-Shop (Stammdaten, Terpene, Beschreibung, Bilder)
+  der erste Admin kommt aus `api/.env` (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) – ohne Vorgabe per Assistent im Browser
+- **Sortenkatalog = Startseite:** Suche, Filter (Hersteller, THC/CBD, Terpen, Wirkung, Bewertung, Verfügbarkeit,
+  Merkliste), Sortierung, Listen-/Kachelansicht; Filter stehen in der URL. Automatischer Abgleich mit dem
+  Kraut-Kurier-Shop (Stammdaten, Terpene, Beschreibung, Bilder)
 
-Weitere Doku: [Architektur](docs/ARCHITEKTUR.md) · [Sicherheit](docs/SICHERHEIT.md) · [Designkonzept](docs/DESIGN.md)
+Weitere Doku: [Architektur](docs/ARCHITEKTUR.md) · [Sicherheit](docs/SICHERHEIT.md) · [Designsystem](docs/DESIGN.md) · Design-Kit in [`design/`](design)
 
 ## Projektstruktur
 
@@ -18,19 +20,20 @@ src/                 Frontend (React)
   api/               Fetch-Client (CSRF, Timeout, Fehler) + typisierte Endpunkte
   components/        atoms / molecules / organisms / templates
   pages/  routes/    Seiten + Routing mit Guards
-  features/          Session, Meta-Vokabular
+  features/          Session, Meta-Vokabular, Katalog (URL-Filter, Laden in Seiten)
   styles/            Design-Tokens
-public/              statische Frontend-Dateien (Favicon)
-scripts/             Build-Helfer
+design/              Design-Kit (verbindlich): tokens.json, Assets, Screen-Referenzen + Abnahme-Screenshots
+scripts/             Build- und Deploy-Helfer (prepare-deploy.mjs, deploy.mjs)
 api/                 Backend (PHP)
   public/            Webroot: index.php, .htaccess, Vite-Build, media/ (Produktbilder)
   src/Core/          MVC-Kern: Kernel, Router, Request/Response, Container, Database, Migrator, Session, Validator
-  src/Domain/        Repositories + Presenter (Users, Invites, Products, Ratings, Settings, Sync)
-  src/Services/      Installer, Auth, RateLimiter, PasswordHasher, Sync/
+  src/Domain/        Repositories + Presenter (Users, Invites, PasswordResets, Products, Favorites, Ratings, Settings, Sync)
+  src/Services/      Installer, Auth, PasswordReset, Mailer, RateLimiter, PasswordHasher, Sync/
   src/Http/          Controller + Middleware
   routes/api.php     alle Endpunkte
   database/migrations/
-  config/            app.php (Standard) + local.php (optional, nicht eingecheckt)
+  config/            app.php (Standard, liest api/.env) + local.php (optional, nicht eingecheckt)
+  .env               Server-Werte: Admin, URL, Mail (nicht eingecheckt, Vorlage .env.example)
   bin/console        CLI: status, migrate, products:sync, invite:create
   storage/           SQLite, Sessions, Logs (automatisch erzeugt, nicht eingecheckt)
   tests/             abhängigkeitsfreier Test-Runner
@@ -52,8 +55,12 @@ npm run api
 npm run dev
 ```
 
-Dann <http://localhost:5220> öffnen. Beim ersten Aufruf startet der Einrichtungsassistent.
+Vorher `api/.env.example` nach `api/.env` kopieren und `ADMIN_EMAIL`/`ADMIN_PASSWORD` eintragen – der Admin
+entsteht beim ersten Aufruf. Dann <http://localhost:5220> öffnen.
 Vite leitet `/api` und `/media` an den PHP-Server auf Port 8095 weiter.
+
+Für „Passwort vergessen“ lokal in `api/.env`: `APP_URL=http://localhost:5220`, `APP_DEBUG=true`, `MAIL_TRANSPORT=log`
+– die Mail samt Link steht dann in `api/storage/logs/app-JJJJ-MM.log`.
 
 Sortenkatalog füllen (oder in der App unter *Verwaltung*):
 
@@ -70,22 +77,41 @@ npm run check
 Führt Typecheck, Frontend-Tests (Vitest) und API-Tests aus. Dieselben Schritte laufen in GitHub Actions
 (`.github/workflows/ci.yml`, PHP 8.1 / 8.3 / 8.4).
 
-## Deployment (z. B. `kompass.red-it.org`)
+## Deployment (`krautkompass.red-it.org`)
 
-1. `npm run build` – der Build landet in `api/public/`.
-2. Den Ordner `api/` hochladen (ohne `storage/`, `tests/` und `dev-router.php`).
-3. **Document Root der Subdomain auf `api/public` setzen.** `src/`, `config/` und `storage/`
-   liegen damit außerhalb des Webroots. Zusätzlich sperrt je eine `.htaccess` diese Ordner.
-4. SSL: bei den meisten Hostern ein Klick (Let's Encrypt) für die Subdomain. `.htaccess` leitet
-   danach auf HTTPS um und setzt HSTS. Sitzt ein eigener Proxy davor (z. B. Cloudflare),
-   in `config/local.php` `security.trust_proxy` auf `true` setzen.
-5. Subdomain im Browser öffnen, Einrichtungsassistent durchlaufen, eigenen Admin anlegen.
-6. Cronjob für den täglichen Katalogabgleich, z. B. 6 Uhr:
-   `0 6 * * * php /pfad/zu/api/bin/console products:sync`
-7. Unter *Verwaltung* Einladungen erzeugen und den Link weitergeben.
+Gleicher Webspace wie die anderen red-it-Apps (Alfahosting/Plesk), Ziel `/html/apps/krautkompass`.
+**Nur nach Freigabe deployen.**
 
-Benötigt Apache 2.4 mit `mod_rewrite` (und idealerweise `mod_headers`). Bei nginx:
-`/api` → `index.php`, sonst `try_files $uri /index.html`, Header aus `.htaccess` übernehmen.
+Einmalig:
+
+1. Subdomain `krautkompass.red-it.org` in Plesk anlegen, **Document Root `/html/apps/krautkompass/public`**
+   (zeigt sie auf `/html/apps/krautkompass`, leitet die `.htaccess` dort alles nach `public/` um). SSL aktivieren.
+2. `.env.deploy.example` nach `.env.deploy` kopieren und das FTP-Passwort eintragen.
+3. `api/.env.example` als `.env` nach `/html/apps/krautkompass/.env` hochladen und ausfüllen:
+   `APP_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (mind. 10 Zeichen), für „Passwort vergessen“
+   `MAIL_TRANSPORT=mail` + `MAIL_FROM` (Absender auf der eigenen Domain).
+   Solange der Admin in der `.env` steht, ist der Einrichtungsassistent gesperrt – niemand kann sich vorher zum Admin machen.
+
+Jedes Deployment:
+
+```powershell
+npm run deploy
+```
+
+Prüft alles (`npm run check`), baut, stellt `deploy/` zusammen und lädt per FTP hoch. Das Skript bricht ab,
+wenn das Ziel nicht auf `/krautkompass` endet, und fasst `storage/` (Datenbank), `public/media/` (Bilder)
+und `.env` nie an.
+
+Nach dem ersten Deployment:
+
+4. Subdomain öffnen – der Admin aus der `.env` wird angelegt. Anmelden, dann `ADMIN_PASSWORD` in der `.env`
+   leeren (die E-Mail stehen lassen). Das Passwort ändert man danach in der App.
+5. Unter *Verwaltung* den Sorten-Abgleich starten, Einladungen erzeugen und weitergeben.
+6. Optional Cronjob für den täglichen Abgleich: `0 6 * * * php /html/apps/krautkompass/bin/console products:sync`
+
+Hinweis: Der Webspace hat **SQLite 3.7.17**. Kein Upsert, kein `RETURNING`, keine JSON-Funktionen,
+keine Window-Functions – ein Test (`CatalogTest`) sucht danach im SQL. Backup = die Datei
+`storage/database.sqlite` per FTP sichern.
 
 ## Datenschutz & Rechtliches (Kurzfassung)
 

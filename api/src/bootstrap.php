@@ -22,6 +22,35 @@ spl_autoload_register(static function (string $class): void {
 });
 
 /**
+ * Server-Werte aus Umgebungsvariablen oder api/.env (KEY=VALUE, # Kommentare).
+ * Echte Umgebungsvariablen haben Vorrang. Leere Werte gelten als nicht gesetzt.
+ */
+function kk_env(string $key, ?string $default = null): ?string
+{
+    static $file = null;
+    if ($file === null) {
+        $file = [];
+        $path = KK_ROOT . '/.env';
+        foreach (is_file($path) ? (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: []) : [] as $line) {
+            $line = trim($line);
+            if ($line === '' || $line[0] === '#' || !str_contains($line, '=')) {
+                continue;
+            }
+            [$name, $value] = array_map('trim', explode('=', $line, 2));
+            if (strlen($value) >= 2 && ($value[0] === '"' || $value[0] === "'") && $value[-1] === $value[0]) {
+                $value = substr($value, 1, -1);
+            }
+            $file[$name] = $value;
+        }
+    }
+    $value = getenv($key);
+    if (!is_string($value) || $value === '') {
+        $value = $file[$key] ?? '';
+    }
+    return $value === '' ? $default : $value;
+}
+
+/**
  * @return array<string, mixed>
  */
 function kk_config(): array

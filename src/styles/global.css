@@ -6,6 +6,11 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 html,
 body,
 #root {
@@ -14,28 +19,37 @@ body,
 
 body {
   margin: 0;
-  font-family: var(--font-base);
-  font-size: 16px;
-  line-height: 1.5;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-text);
   background: var(--color-background);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1,
 h2,
 h3 {
   margin: 0 0 var(--space-3);
+  font-family: var(--font-heading);
   font-weight: 500;
-  line-height: 1.25;
+  line-height: var(--leading-tight);
+  color: var(--color-text);
 }
 
 h1 {
-  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  font-size: var(--text-h1);
 }
 
 a {
   color: var(--color-primary);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
 }
 
 img {
@@ -44,6 +58,16 @@ img {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-text);
+}
+
+/* Offenes Sheet/Dialog: Seite dahinter nicht mitscrollen (iOS) */
+html:has(dialog[open]) {
+  overflow: hidden;
 }

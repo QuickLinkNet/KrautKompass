@@ -17,6 +17,9 @@ api/public/media/*
 
 # Lokale Konfiguration
 api/config/local.php
+api/.env
+.env.deploy
+deploy/
 .env.local
 
 # Editor / OS

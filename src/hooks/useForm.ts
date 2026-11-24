@@ -15,6 +15,7 @@ export function useForm<T extends Record<string, unknown>>(initial: T) {
 
   const handleSubmit = (action: (values: T) => Promise<void>) => async (event?: FormEvent) => {
     event?.preventDefault();
+    const formElement = event?.currentTarget instanceof HTMLFormElement ? event.currentTarget : null;
     setSubmitting(true);
     setErrors({});
     setFormError(null);
@@ -24,6 +25,10 @@ export function useForm<T extends Record<string, unknown>>(initial: T) {
       const fields = fieldErrors(e);
       setErrors(fields);
       setFormError(Object.keys(fields).length > 0 ? null : errorMessage(e));
+      // Tastatur & Screenreader: direkt zum ersten fehlerhaften Feld (Fehlertext hängt per aria-describedby dran).
+      if (Object.keys(fields).length > 0 && formElement) {
+        requestAnimationFrame(() => formElement.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+      }
     } finally {
       setSubmitting(false);
     }

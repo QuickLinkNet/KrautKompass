@@ -24,6 +24,8 @@ return static function (Router $r): void {
             // Öffentlich (ohne Login)
             $r->post('/auth/login', [AuthController::class, 'login']);
             $r->post('/auth/register', [AuthController::class, 'register']);
+            $r->post('/auth/password/forgot', [AuthController::class, 'forgotPassword']);
+            $r->post('/auth/password/reset', [AuthController::class, 'resetPassword']);
             $r->get('/invites/{code}', [AuthController::class, 'checkInvite']);
 
             // Angemeldet
@@ -38,6 +40,8 @@ return static function (Router $r): void {
                 $r->get('/products/{id}', [ProductController::class, 'show']);
                 $r->put('/products/{id}/rating', [RatingController::class, 'upsert']);
                 $r->delete('/products/{id}/rating', [RatingController::class, 'destroy']);
+                $r->put('/products/{id}/favorite', [ProductController::class, 'favorite']);
+                $r->delete('/products/{id}/favorite', [ProductController::class, 'unfavorite']);
 
                 $r->get('/ratings/mine', [RatingController::class, 'mine']);
                 $r->get('/ratings/feed', [RatingController::class, 'feed']);
