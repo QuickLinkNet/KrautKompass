@@ -56,11 +56,11 @@ export function AppRoutes() {
         {/* Startseite: Sortenkatalog mit eigener Vollbreite (Kopfband) */}
         <Route index element={<ProductsPage />} />
         <Route path="/neuigkeiten" element={<NewsPage />} />
+        <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" replace />} />
         <Route element={<PageContainer />}>
           <Route path="/sorten/:id" element={<ProductDetailPage />} />
           <Route path="/bewertungen" element={<JournalPage />} />
           <Route path="/konto" element={<AccountPage />} />
-          <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" replace />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

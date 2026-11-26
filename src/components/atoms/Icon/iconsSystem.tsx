@@ -28,6 +28,18 @@ export const SYSTEM_ICONS = {
       <path d="M20 20.5V16h-4.5" />
     </>
   ),
+  copy: (
+    <>
+      <rect x="8.5" y="8.5" width="12" height="12" rx="2" />
+      <path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3" />
+    </>
+  ),
+  send: (
+    <>
+      <path d="M21 3 10 14" />
+      <path d="m21 3-7 18-4-7-7-4 18-7Z" />
+    </>
+  ),
   pencil: (
     <>
       <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />

@@ -1,0 +1,143 @@
+.section {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.top {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-h2);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* Karte „Einladung ist bereit“: zart grün hinterlegt */
+.ready {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--color-success) 25%, transparent);
+  border-radius: var(--radius-md);
+  background: var(--color-success-soft);
+}
+
+.readyIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding-left: var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+}
+
+.linkText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-small);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.readyActions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-2);
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.title {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-h2);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-primary);
+}
+
+.who strong {
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.badges,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Ab Tablet: Formular und fertige Einladung nebeneinander, Zeilen einzeilig */
+@media (min-width: 768px) {
+  .row {
+    grid-template-columns: minmax(140px, 1fr) auto auto;
+    align-items: center;
+  }
+
+  .actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (min-width: 1024px) {
+  .top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
