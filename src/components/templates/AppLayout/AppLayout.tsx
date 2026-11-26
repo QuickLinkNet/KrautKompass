@@ -1,6 +1,7 @@
 import { Link, Outlet } from 'react-router';
 import { AppHeader } from '../../organisms/AppHeader/AppHeader';
 import { AppNotices } from '../../organisms/AppNotices/AppNotices';
+import { WelcomeDialog } from '../../organisms/WelcomeDialog/WelcomeDialog';
 import styles from './AppLayout.module.css';
 
 /** Rahmen für alle Seiten nach dem Login. Seiten bestimmen ihre Breite selbst. */
@@ -9,6 +10,7 @@ export function AppLayout() {
     <div className={styles.shell}>
       <AppHeader />
       <AppNotices />
+      <WelcomeDialog />
       <main className={styles.main} id="inhalt">
         <Outlet />
       </main>

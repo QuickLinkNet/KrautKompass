@@ -20,4 +20,13 @@ return [
         assert_same(401, api($k, 'POST', '/api/auth/login', ['email' => 'admin@test.de', 'password' => 'geheim-geheim'])['status']);
         assert_same(200, api($k, 'POST', '/api/auth/login', ['email' => 'admin@test.de', 'password' => 'neues-passwort-1'])['status']);
     },
+
+    'Begrüßung wird einmal pro Konto gemerkt' => static function (): void {
+        [$k] = installed_kernel();
+        assert_same(null, api($k, 'GET', '/api/auth/me')['json']['user']['welcomed_at']);
+        $res = api($k, 'PATCH', '/api/auth/me', ['welcomed' => true]);
+        assert_same(200, $res['status'], json_encode($res['json']));
+        assert_true(is_string(api($k, 'GET', '/api/auth/me')['json']['user']['welcomed_at']));
+        assert_same(422, api($k, 'PATCH', '/api/auth/me', ['welcomed' => 'ja'])['status']);
+    },
 ];

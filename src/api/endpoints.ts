@@ -21,7 +21,7 @@ export const authApi = {
   resetPassword: (token: string, password: string) =>
     api.post<{ reset: boolean }>('/auth/password/reset', { token, password }),
   checkInvite: (code: string) => api.get<{ valid: boolean; expiresAt: string }>(`/invites/${encodeURIComponent(code)}`),
-  updateProfile: (data: { display_name?: string; current_password?: string; new_password?: string }) =>
+  updateProfile: (data: { display_name?: string; current_password?: string; new_password?: string; welcomed?: boolean }) =>
     api.patch<{ user: User }>('/auth/me', data),
 };
 

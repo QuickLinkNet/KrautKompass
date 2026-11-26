@@ -13,6 +13,8 @@ export interface User {
   status: 'active' | 'disabled';
   created_at: string;
   last_login_at: string | null;
+  /** Begrüßung nach dem ersten Login gesehen (null = noch zeigen) */
+  welcomed_at: string | null;
 }
 
 export interface Requirement {

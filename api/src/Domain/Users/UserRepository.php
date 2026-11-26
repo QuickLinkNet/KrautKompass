@@ -9,7 +9,7 @@ use KrautKompass\Support\Clock;
 
 final class UserRepository
 {
-    private const PUBLIC_COLUMNS = 'id, email, display_name, role, status, created_at, last_login_at';
+    private const PUBLIC_COLUMNS = 'id, email, display_name, role, status, created_at, last_login_at, welcomed_at';
 
     public function __construct(private readonly Database $db)
     {
@@ -60,7 +60,7 @@ final class UserRepository
     /** @param array<string, mixed> $changes erlaubt: display_name, role, status, password_hash */
     public function update(int $id, array $changes): void
     {
-        $allowed = array_intersect_key($changes, array_flip(['display_name', 'role', 'status', 'password_hash']));
+        $allowed = array_intersect_key($changes, array_flip(['display_name', 'role', 'status', 'password_hash', 'welcomed_at']));
         if ($allowed === []) {
             return;
         }

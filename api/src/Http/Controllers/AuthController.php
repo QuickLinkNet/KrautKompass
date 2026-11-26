@@ -17,6 +17,7 @@ use KrautKompass\Services\Auth;
 use KrautKompass\Services\PasswordHasher;
 use KrautKompass\Services\PasswordReset;
 use KrautKompass\Services\RateLimiter;
+use KrautKompass\Support\Clock;
 
 final class AuthController extends Controller
 {
@@ -104,8 +105,12 @@ final class AuthController extends Controller
             'display_name' => 'string|min:2|max:40',
             'current_password' => 'raw|string|max:200',
             'new_password' => "raw|string|min:$min|max:200",
+            'welcomed' => 'bool',
         ]);
         $changes = [];
+        if ($input['welcomed'] === true) {
+            $changes['welcomed_at'] = Clock::now();
+        }
         if ($input['display_name'] !== null) {
             $changes['display_name'] = $input['display_name'];
         }
