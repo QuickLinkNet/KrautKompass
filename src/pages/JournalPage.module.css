@@ -1,0 +1,29 @@
+.page {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+}
+
+.lead {
+  margin: var(--space-1) 0 var(--space-5);
+  color: var(--color-text-muted);
+}
+
+.tabs {
+  margin-bottom: var(--space-5);
+}
+
+.section {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-h2);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

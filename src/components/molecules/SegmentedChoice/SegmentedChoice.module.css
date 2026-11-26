@@ -12,6 +12,11 @@
   grid-template-columns: 2fr 3fr;
 }
 
+/* fit = alle Optionen in einer Zeile, gleich breit (kurze Werte wie „4+“) */
+.fit {
+  grid-template-columns: repeat(auto-fit, minmax(52px, 1fr));
+}
+
 .segment {
   position: relative;
   display: flex;

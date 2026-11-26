@@ -1,0 +1,144 @@
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  grid-template-areas:
+    'media main'
+    'details details'
+    'side side';
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.media {
+  grid-area: media;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+  color: var(--color-secondary);
+  overflow: hidden;
+}
+
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.main {
+  grid-area: main;
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: var(--text-body);
+  overflow-wrap: anywhere;
+}
+
+.name a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.name a:hover {
+  text-decoration: underline;
+}
+
+.facts {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.facts span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.details {
+  grid-area: details;
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+}
+
+.notes {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--text-small);
+  line-height: 1.45;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.side {
+  grid-area: side;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.visibility {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.edit {
+  width: 100%;
+}
+
+/* Tablet: Foto links, Aktionen rechts, Wirkungen und Notiz unter dem Namen */
+@media (min-width: 768px) {
+  .card {
+    grid-template-columns: 88px minmax(0, 1fr) 210px;
+    grid-template-areas:
+      'media main side'
+      'media details side';
+    align-items: start;
+    padding: var(--space-4);
+  }
+
+  .media {
+    width: 88px;
+    height: 88px;
+  }
+
+  .side {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Desktop: vier Spalten wie im Entwurf */
+@media (min-width: 1024px) {
+  .card {
+    grid-template-columns: 88px minmax(190px, 1fr) minmax(0, 1.6fr) 210px;
+    grid-template-areas: 'media main details side';
+  }
+}

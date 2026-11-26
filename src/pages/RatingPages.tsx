@@ -4,19 +4,6 @@ import { Alert } from '../components/molecules/Alert/Alert';
 import { RatingList } from '../components/organisms/RatingList/RatingList';
 import { useAsyncResource } from '../hooks/useAsyncResource';
 
-export function MyRatingsPage() {
-  const mine = useAsyncResource(() => ratingApi.mine(), []);
-  return (
-    <>
-      <h1>Meine Bewertungen</h1>
-      {mine.error && <Alert>{mine.error}</Alert>}
-      {mine.loading ? <Spinner /> : (
-        <RatingList ratings={mine.data?.items ?? []} showProduct empty="Du hast noch keine Sorte bewertet." />
-      )}
-    </>
-  );
-}
-
 export function FeedPage() {
   const feed = useAsyncResource(() => ratingApi.feed(50), []);
   return (

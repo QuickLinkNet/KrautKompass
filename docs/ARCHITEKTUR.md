@@ -104,6 +104,8 @@ JSON-Spalten werden per `instr()` gefiltert, Facetten und Top-Wirkungen in PHP b
 - **Sortenkatalog** (`pages/ProductsPage`, Startseite `/`): Filter stehen in der URL (`features/catalog/catalogQuery`,
   teilbar, Zurück-Taste funktioniert), `useCatalog` lädt seitenweise und schaltet die Merkliste optimistisch um.
   Desktop: Seitenleiste; darunter: Filter-Sheet (`<dialog>`). Auf dem Handy immer Listenansicht.
+- **Journal** (`pages/JournalPage`, `/bewertungen`): eigene Bewertungen und Merkliste, Filter in der URL
+  (`features/journal/journalQuery`), Überblick im Browser berechnet (`journalSummary`).
 - **Design-Tokens** in `src/styles/tokens.css`: Rohwerte aus `design/tokens.json` (per Test synchron
   gehalten) plus semantische Tokens, die allein in Komponenten benutzt werden. Siehe [DESIGN.md](DESIGN.md).
 - **Assets** (Logos, Fotos, Favicon, App-Icon) werden direkt aus `design/assets/` importiert – eine Quelle, kein Kopieren.

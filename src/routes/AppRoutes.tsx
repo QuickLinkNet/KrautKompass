@@ -13,7 +13,8 @@ import { AdminPage } from '../pages/AdminPage';
 import { ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage, SetupPage } from '../pages/AuthPages';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { ProductsPage } from '../pages/ProductsPage';
-import { FeedPage, MyRatingsPage } from '../pages/RatingPages';
+import { FeedPage } from '../pages/RatingPages';
+import { JournalPage } from '../pages/JournalPage';
 
 /**
  * Routing mit Guards:
@@ -56,7 +57,7 @@ export function AppRoutes() {
         <Route index element={<ProductsPage />} />
         <Route element={<PageContainer />}>
           <Route path="/sorten/:id" element={<ProductDetailPage />} />
-          <Route path="/bewertungen" element={<MyRatingsPage />} />
+          <Route path="/bewertungen" element={<JournalPage />} />
           <Route path="/neuigkeiten" element={<FeedPage />} />
           <Route path="/konto" element={<AccountPage />} />
           <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" replace />} />

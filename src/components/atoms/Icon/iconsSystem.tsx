@@ -28,6 +28,12 @@ export const SYSTEM_ICONS = {
       <path d="M20 20.5V16h-4.5" />
     </>
   ),
+  pencil: (
+    <>
+      <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />
+      <path d="m13.5 6.5 4 4" />
+    </>
+  ),
   wifiOff: (
     <>
       <path d="M3 3l18 18" />

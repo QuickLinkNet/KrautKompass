@@ -14,7 +14,7 @@ interface SegmentedChoiceProps<T extends string> {
   value: T | null;
   onChange: (next: T | null) => void;
   /** auto = Breite nach Textlänge (zwei unterschiedlich lange Segmente) */
-  columns?: 2 | 3 | 'auto';
+  columns?: 2 | 3 | 'auto' | 'fit';
   /** Erneutes Tippen hebt die Auswahl auf (freiwillige Angaben) */
   clearable?: boolean;
 }
@@ -23,7 +23,7 @@ interface SegmentedChoiceProps<T extends string> {
 export function SegmentedChoice<T extends string>({ label, options, value, onChange, columns = 2, clearable = false }: SegmentedChoiceProps<T>) {
   const name = useId();
   return (
-    <div className={`${styles.group} ${columns === 3 ? styles.three : columns === 'auto' ? styles.auto : ''}`} role="radiogroup" aria-label={label}>
+    <div className={`${styles.group} ${columns === 3 ? styles.three : columns === 'auto' ? styles.auto : columns === 'fit' ? styles.fit : ''}`} role="radiogroup" aria-label={label}>
       {options.map((option) => {
         const active = option.value === value;
         return (

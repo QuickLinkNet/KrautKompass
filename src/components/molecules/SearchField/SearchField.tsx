@@ -10,10 +10,11 @@ interface SearchFieldProps {
   onCommit: (value: string) => void;
   /** Sichtbare Beschriftung; ohne = nur für Screenreader */
   label?: string;
+  placeholder?: string;
 }
 
 /** Suchfeld mit Lupe und Löschen-Knopf; übernimmt die Eingabe verzögert. */
-export function SearchField({ id, value, onCommit, label }: SearchFieldProps) {
+export function SearchField({ id, value, onCommit, label, placeholder = 'Sorte, Hersteller, Terpen …' }: SearchFieldProps) {
   const [draft, setDraft] = useDraft(value, (v) => onCommit(v.trim()));
   return (
     <div className={styles.field}>
@@ -24,7 +25,7 @@ export function SearchField({ id, value, onCommit, label }: SearchFieldProps) {
         icon="search"
         enterKeyHint="search"
         autoComplete="off"
-        placeholder="Sorte, Hersteller, Terpen …"
+        placeholder={placeholder}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         trailing={draft ? (
