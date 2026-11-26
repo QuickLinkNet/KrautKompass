@@ -50,6 +50,12 @@
   color: var(--color-on-dark-muted);
 }
 
+.leadPhone {
+  display: block;
+  max-width: 30ch;
+  font-size: var(--text-small);
+}
+
 @media (min-width: 768px) {
   .photo {
     width: 55%;

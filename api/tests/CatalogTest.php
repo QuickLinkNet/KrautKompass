@@ -47,8 +47,8 @@ return [
     'Wirkung und Mindestbewertung filtern über Gruppenbewertungen, private zählen nicht' => static function (): void {
         [$k, $luana] = installed_kernel();
         $lemon = add_second_product($k);
-        api($k, 'PUT', "/api/products/$luana/rating", ['overall' => 9, 'effects' => ['schlaffoerdernd'], 'visibility' => 'group']);
-        api($k, 'PUT', "/api/products/$lemon/rating", ['overall' => 10, 'effects' => ['kreativ'], 'visibility' => 'private']);
+        api($k, 'POST', "/api/products/$luana/ratings", ['overall' => 9, 'effects' => ['schlaffoerdernd'], 'visibility' => 'group']);
+        api($k, 'POST', "/api/products/$lemon/ratings", ['overall' => 10, 'effects' => ['kreativ'], 'visibility' => 'private']);
         assert_same(['Luana 28/1 LMO Larrys GMO'], catalog($k, ['effects' => 'schlaffoerdernd,unbekannt']));
         assert_same([], catalog($k, ['effects' => 'kreativ']));
         assert_same(['Luana 28/1 LMO Larrys GMO'], catalog($k, ['minRating' => '8']));

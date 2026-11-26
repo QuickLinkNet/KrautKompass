@@ -90,12 +90,14 @@ final class ProductController extends Controller
             fn (array $r): array => $this->ratingPresenter->present($r, $viewer),
             $this->ratings->visibleForProduct((int) $row['id'], $viewer),
         );
+        // Eigene Bewertungen (Tagebuch, neueste zuerst); in „ratings“ stehen sie zusätzlich
         $mine = array_values(array_filter($ratings, static fn (array $r): bool => $r['isMine']));
+        usort($mine, static fn (array $a, array $b): int => [$b['createdAt'], $b['id']] <=> [$a['createdAt'], $a['id']]);
 
         return $this->json([
             'product' => $this->presenter->present($row, true),
             'summary' => $this->stats->groupSummary((int) $row['id']),
-            'myRating' => $mine[0] ?? null,
+            'myRatings' => $mine,
             'ratings' => $ratings,
         ]);
     }

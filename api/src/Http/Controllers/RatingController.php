@@ -24,13 +24,82 @@ final class RatingController extends Controller
     ) {
     }
 
-    /** PUT /api/products/{id}/rating – eigene Bewertung anlegen oder ändern */
-    public function upsert(Request $request): Response
+    /** POST /api/products/{id}/ratings – neue Bewertung (mehrere pro Sorte möglich, Tagebuch) */
+    public function store(Request $request): Response
     {
         $productId = $request->intParam('id');
         if ($this->products->find($productId) === null) {
             throw HttpException::notFound('Sorte nicht gefunden.');
         }
+        $userId = $this->userId($request);
+        $id = $this->ratings->create($userId, $productId, $this->validated($request));
+        return $this->json(['rating' => $this->presentOne($id, $userId)], 201);
+    }
+
+    /** PUT /api/ratings/{id} – eigene Bewertung ändern */
+    public function update(Request $request): Response
+    {
+        $userId = $this->userId($request);
+        $id = $request->intParam('id');
+        if (!$this->ratings->update($id, $userId, $this->validated($request))) {
+            throw HttpException::notFound('Bewertung nicht gefunden.');
+        }
+        return $this->json(['rating' => $this->presentOne($id, $userId)]);
+    }
+
+    /** DELETE /api/ratings/{id} – eigene Bewertung löschen */
+    public function destroy(Request $request): Response
+    {
+        if (!$this->ratings->delete($request->intParam('id'), $this->userId($request))) {
+            throw HttpException::notFound('Bewertung nicht gefunden.');
+        }
+        return Response::noContent();
+    }
+
+    public function mine(Request $request): Response
+    {
+        $userId = $this->userId($request);
+        return $this->json(['items' => $this->presentAll($this->ratings->byUser($userId), $userId)]);
+    }
+
+    /** GET /api/ratings/feed?limit&offset&author&favorites – nur geteilte Bewertungen */
+    public function feed(Request $request): Response
+    {
+        $userId = $this->userId($request);
+        $limit = min(100, max(1, (int) $request->query('limit', 30)));
+        $offset = max(0, (int) $request->query('offset', 0));
+        $author = (int) $request->query('author', 0);
+        // Einen mehr laden, um zu wissen, ob es ältere gibt
+        $rows = $this->ratings->feed($userId, $limit + 1, $offset, $author > 0 ? $author : null, $request->query('favorites') === '1');
+        return $this->json([
+            'items' => $this->presentAll(array_slice($rows, 0, $limit), $userId),
+            'hasMore' => count($rows) > $limit,
+            'authors' => $this->ratings->feedAuthors(),
+        ]);
+    }
+
+    /**
+     * @param list<array<string, mixed>> $rows
+     * @return list<array<string, mixed>>
+     */
+    private function presentAll(array $rows, int $viewer): array
+    {
+        return array_map(fn (array $r): array => $this->presenter->present($r, $viewer), $rows);
+    }
+
+    /** @return array<string, mixed> */
+    private function presentOne(int $id, int $viewer): array
+    {
+        $row = $this->ratings->find($id);
+        if ($row === null) {
+            throw HttpException::notFound('Bewertung nicht gefunden.');
+        }
+        return $this->presenter->present($row, $viewer);
+    }
+
+    /** @return array<string, mixed> geprüfte Felder einer Bewertung */
+    private function validated(Request $request): array
+    {
         $max = $this->config->int('ratings.scale_max');
         $methods = implode(',', array_keys($this->config->array('ratings.methods')));
         $input = Validator::validate($request->json(), [
@@ -52,41 +121,7 @@ final class RatingController extends Controller
         if ($input['consumed_at'] !== null && !self::validDate((string) $input['consumed_at'])) {
             throw HttpException::validation(['consumed_at' => 'Gültiges Datum im Format JJJJ-MM-TT, nicht in der Zukunft.']);
         }
-
-        $userId = $this->userId($request);
-        $this->ratings->upsert($userId, $productId, $input);
-        $row = $this->ratings->findForUser($userId, $productId);
-        return $this->json(['rating' => $row === null ? null : $this->presenter->present($row, $userId)]);
-    }
-
-    public function destroy(Request $request): Response
-    {
-        if (!$this->ratings->delete($this->userId($request), $request->intParam('id'))) {
-            throw HttpException::notFound('Keine Bewertung vorhanden.');
-        }
-        return Response::noContent();
-    }
-
-    public function mine(Request $request): Response
-    {
-        $userId = $this->userId($request);
-        return $this->json(['items' => $this->presentAll($this->ratings->byUser($userId), $userId)]);
-    }
-
-    public function feed(Request $request): Response
-    {
-        $userId = $this->userId($request);
-        $limit = min(100, max(1, (int) $request->query('limit', 30)));
-        return $this->json(['items' => $this->presentAll($this->ratings->feed($userId, $limit), $userId)]);
-    }
-
-    /**
-     * @param list<array<string, mixed>> $rows
-     * @return list<array<string, mixed>>
-     */
-    private function presentAll(array $rows, int $viewer): array
-    {
-        return array_map(fn (array $r): array => $this->presenter->present($r, $viewer), $rows);
+        return $input;
     }
 
     private static function validDate(string $date): bool

@@ -47,10 +47,25 @@ export interface ProductQuery {
   perPage?: number;
 }
 
+export interface FeedQuery {
+  limit?: number;
+  offset?: number;
+  author?: number | null;
+  favorites?: boolean;
+}
+
+export interface FeedResponse {
+  items: Rating[];
+  hasMore: boolean;
+  /** Mitglieder, die schon etwas geteilt haben */
+  authors: { id: number; name: string }[];
+}
+
 export interface ProductDetailResponse {
   product: ProductDetails;
   summary: GroupSummary;
-  myRating: Rating | null;
+  /** Eigene Bewertungen dieser Sorte, neueste zuerst */
+  myRatings: Rating[];
   ratings: Rating[];
 }
 
@@ -64,13 +79,21 @@ export const productApi = {
   facets: () => api.get<Facets>('/products/facets'),
   show: (id: number) =>
     api.get<ProductDetailResponse>(`/products/${id}`),
-  rate: (id: number, input: RatingInput) => api.put<{ rating: Rating }>(`/products/${id}/rating`, input),
-  deleteRating: (id: number) => api.delete<void>(`/products/${id}/rating`),
 };
 
 export const ratingApi = {
+  /** Neue Bewertung (mehrere pro Sorte möglich) */
+  create: (productId: number, input: RatingInput) => api.post<{ rating: Rating }>(`/products/${productId}/ratings`, input),
+  update: (id: number, input: RatingInput) => api.put<{ rating: Rating }>(`/ratings/${id}`, input),
+  remove: (id: number) => api.delete<void>(`/ratings/${id}`),
   mine: () => api.get<{ items: Rating[] }>('/ratings/mine'),
-  feed: (limit = 30) => api.get<{ items: Rating[] }>('/ratings/feed', { limit }),
+  /** Nur mit der Runde geteilte Bewertungen */
+  feed: (query: FeedQuery = {}) => api.get<FeedResponse>('/ratings/feed', {
+    limit: query.limit ?? 30,
+    offset: query.offset || undefined,
+    author: query.author ?? undefined,
+    favorites: query.favorites ? '1' : undefined,
+  }),
 };
 
 export const adminApi = {

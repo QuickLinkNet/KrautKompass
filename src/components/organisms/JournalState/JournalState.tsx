@@ -1,6 +1,7 @@
 import { Button, ButtonLink } from '../../atoms/Button/Button';
-import { Icon, type IconName } from '../../atoms/Icon/Icon';
+import type { IconName } from '../../atoms/Icon/Icon';
 import { Skeleton } from '../../atoms/Skeleton/Skeleton';
+import { StateMessage } from '../../molecules/StateMessage/StateMessage';
 import styles from './JournalState.module.css';
 
 type Kind = 'empty' | 'emptyFavorites' | 'noResults' | 'error';
@@ -25,14 +26,11 @@ interface JournalStateProps {
 export function JournalState({ kind, onAction }: JournalStateProps) {
   const c = CONTENT[kind];
   return (
-    <div className={styles.state} role={kind === 'error' ? 'alert' : 'status'}>
-      <Icon name={c.icon} size={24} className={kind === 'error' ? styles.danger : styles.icon} />
-      <p className={styles.title}>{c.title}</p>
-      {c.text && <p className={styles.text}>{c.text}</p>}
+    <StateMessage icon={c.icon} title={c.title} text={c.text} tone={kind === 'error' ? 'danger' : 'default'}>
       {kind === 'empty' && <ButtonLink to="/" variant="primary" iconEnd="arrowRight">Zum Sortenkatalog</ButtonLink>}
       {kind === 'noResults' && <Button variant="secondary" iconEnd="reset" onClick={onAction}>Filter zurücksetzen</Button>}
       {kind === 'error' && <Button iconEnd="refresh" onClick={onAction}>Erneut versuchen</Button>}
-    </div>
+    </StateMessage>
   );
 }
 

@@ -56,6 +56,8 @@ export interface Product {
   rating: { average: number | null; count: number };
   /** Auf der eigenen Merkliste */
   favorite: boolean;
+  /** Erscheinungsdatum im Shop (ISO), falls bekannt */
+  releasedAt: string | null;
   /** Häufigste Wirkungen laut Gruppenbewertungen (nur in der Liste) */
   topEffects?: string[];
 }

@@ -12,10 +12,12 @@ interface ProductHeroProps {
   onToggleFavorite: () => void;
   /** Fehlt, wenn schon bewertet wurde – dann steht „Bewertung ändern“ an der eigenen Bewertung */
   onRate?: () => void;
+  /** „Jetzt bewerten“ oder „Neue Bewertung“ */
+  rateLabel?: string;
 }
 
 /** Kopf der Sortenseite: Foto, Name, Bewertung der Runde, THC/CBD und Aktionen. */
-export function ProductHero({ product, isFavorite, onToggleFavorite, onRate }: ProductHeroProps) {
+export function ProductHero({ product, isFavorite, onToggleFavorite, onRate, rateLabel = 'Jetzt bewerten' }: ProductHeroProps) {
   const { average, count } = product.rating;
   return (
     <section className={styles.hero}>
@@ -51,7 +53,7 @@ export function ProductHero({ product, isFavorite, onToggleFavorite, onRate }: P
           <span className={styles.metric}>CBD <strong>{formatCannabinoid(product.cbd)}</strong></span>
         </p>
         <div className={styles.actions}>
-          {onRate && <Button type="button" block className={styles.rate} onClick={onRate}>Jetzt bewerten</Button>}
+          {onRate && <Button type="button" block className={styles.rate} onClick={onRate}>{rateLabel}</Button>}
           <Button type="button" block variant={isFavorite ? 'primary' : 'secondary'} icon="heart" aria-pressed={isFavorite}
             className={isFavorite ? styles.favored : undefined} onClick={onToggleFavorite}>
             {isFavorite ? 'Gemerkt' : 'Auf Merkliste'}

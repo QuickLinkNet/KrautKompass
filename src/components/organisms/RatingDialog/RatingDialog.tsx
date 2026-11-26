@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type RefObject } from 'react';
-import { productApi } from '../../../api/endpoints';
+import { ratingApi } from '../../../api/endpoints';
 import type { Meta, Product, Rating } from '../../../api/types';
 import { isDirty, toDraft, toInput, VISIBILITY_OPTIONS, type RatingDraft } from '../../../features/rating/ratingDraft';
 import { errorMessage } from '../../../utils/errorMessage';
@@ -75,7 +75,9 @@ export function RatingDialog({ open, product, meta, existing, onClose, onChanged
     setBusy(true);
     setError(null);
     try {
-      await productApi.rate(product.id, toInput(draft, draft.overall));
+      const input = toInput(draft, draft.overall);
+      if (existing) await ratingApi.update(existing.id, input);
+      else await ratingApi.create(product.id, input);
       setView('saved');
       onChanged();
     } catch (e) {
@@ -89,7 +91,7 @@ export function RatingDialog({ open, product, meta, existing, onClose, onChanged
     setBusy(true);
     setDeleteError(null);
     try {
-      await productApi.deleteRating(product.id);
+      if (existing) await ratingApi.remove(existing.id);
       setAsk(null);
       onChanged();
       onClose();

@@ -40,7 +40,7 @@ export function JournalPage() {
     sideEffect: (k: string) => labelFor(meta?.sideEffects, k),
     method: (k: string) => labelFor(meta?.methods, k),
   };
-  const edit = (r: Rating) => void navigate(`/sorten/${r.productId}`, { state: { rating: true } });
+  const edit = (r: Rating) => void navigate(`/sorten/${r.productId}`, { state: { rating: true, ratingId: r.id } });
   const unfavorite = async (p: Product) => {
     setRemoved((ids) => [...ids, p.id]);
     try {

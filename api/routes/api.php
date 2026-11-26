@@ -38,8 +38,9 @@ return static function (Router $r): void {
                 $r->get('/products', [ProductController::class, 'index']);
                 $r->get('/products/facets', [ProductController::class, 'facets']);
                 $r->get('/products/{id}', [ProductController::class, 'show']);
-                $r->put('/products/{id}/rating', [RatingController::class, 'upsert']);
-                $r->delete('/products/{id}/rating', [RatingController::class, 'destroy']);
+                $r->post('/products/{id}/ratings', [RatingController::class, 'store']);
+                $r->put('/ratings/{id}', [RatingController::class, 'update']);
+                $r->delete('/ratings/{id}', [RatingController::class, 'destroy']);
                 $r->put('/products/{id}/favorite', [ProductController::class, 'favorite']);
                 $r->delete('/products/{id}/favorite', [ProductController::class, 'unfavorite']);
 

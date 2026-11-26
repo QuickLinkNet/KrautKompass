@@ -25,7 +25,8 @@ final class ProductRepository
         'rating' => 'avg_overall IS NULL, avg_overall DESC, rating_count DESC, p.name COLLATE NOCASE',
         'thc' => 'p.thc IS NULL, p.thc DESC, p.name COLLATE NOCASE',
         'thc_asc' => 'p.thc IS NULL, p.thc ASC, p.name COLLATE NOCASE',
-        'newest' => 'p.created_at DESC, p.id DESC',
+        // Erscheinungsdatum im Shop (Neu im Katalog), sonst Zeitpunkt der Aufnahme
+        'newest' => 'COALESCE(p.source_updated_at, p.created_at) DESC, p.id DESC',
         'name' => 'p.name COLLATE NOCASE ASC',
     ];
 

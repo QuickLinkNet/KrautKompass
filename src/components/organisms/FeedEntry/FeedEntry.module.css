@@ -1,0 +1,143 @@
+.entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-areas:
+    'who who'
+    'media rating'
+    'tags tags'
+    'notes notes';
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-8) var(--space-3) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.entry:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.who {
+  grid-area: who;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.sentence {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.link {
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* Die ganze Karte ist klickbar */
+.link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.time {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 2px 0 0;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.updated {
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  font-size: var(--text-micro);
+  font-weight: 600;
+}
+
+.media {
+  grid-area: media;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+  color: var(--color-secondary);
+  overflow: hidden;
+}
+
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.rating {
+  grid-area: rating;
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.method {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.tags {
+  grid-area: tags;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: var(--space-1) var(--space-2);
+}
+
+.notes {
+  grid-area: notes;
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--text-small);
+  line-height: 1.45;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.chevron {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  color: var(--color-text-muted);
+  transform: translateY(-50%);
+}
+
+/* Desktop: eine Zeile wie im Entwurf */
+@media (min-width: 1024px) {
+  .entry {
+    grid-template-columns: minmax(200px, 1.1fr) 64px minmax(200px, 1.3fr) minmax(0, 1.4fr);
+    grid-template-areas:
+      'who media rating notes'
+      'who media tags notes';
+    align-items: start;
+  }
+}

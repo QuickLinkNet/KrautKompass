@@ -61,11 +61,11 @@ return [
 
     'Private Bewertungen sieht nur der Autor, geteilte die Gruppe' => static function (): void {
         [$k, $productId] = installed_kernel();
-        $put = api($k, 'PUT', "/api/products/$productId/rating", [
+        $put = api($k, 'POST', "/api/products/$productId/ratings", [
             'overall' => 8, 'taste' => 7, 'effects' => ['entspannend', 'kreativ'], 'visibility' => 'private',
             'method' => 'vaporizer', 'notes' => 'Abends top', 'consumed_at' => '2026-11-20',
         ]);
-        assert_same(200, $put['status'], json_encode($put['json']));
+        assert_same(201, $put['status'], json_encode($put['json']));
         assert_same(['entspannend', 'kreativ'], $put['json']['rating']['effects']);
 
         invite_and_register($k, 'Freundin', 'f@test.de');
@@ -75,18 +75,18 @@ return [
 
         api($k, 'POST', '/api/auth/logout');
         api($k, 'POST', '/api/auth/login', ['email' => 'admin@test.de', 'password' => 'geheim-geheim']);
-        api($k, 'PUT', "/api/products/$productId/rating", ['overall' => 9, 'visibility' => 'group']);
+        api($k, 'POST', "/api/products/$productId/ratings", ['overall' => 9, 'visibility' => 'group']);
         api($k, 'POST', '/api/auth/logout');
         api($k, 'POST', '/api/auth/login', ['email' => 'f@test.de', 'password' => 'passwort-123']);
         $view = api($k, 'GET', "/api/products/$productId")['json'];
         assert_same(1, count($view['ratings']));
         assert_same(9.0, $view['product']['rating']['average']);
-        assert_same(null, $view['myRating']);
+        assert_same([], $view['myRatings']);
     },
 
     'Bewertung lehnt unbekannte Wirkungen und Werte außerhalb der Skala ab' => static function (): void {
         [$k, $productId] = installed_kernel();
-        $res = api($k, 'PUT', "/api/products/$productId/rating", [
+        $res = api($k, 'POST', "/api/products/$productId/ratings", [
             'overall' => 11, 'effects' => ['fliegen'], 'visibility' => 'group',
         ]);
         assert_same(422, $res['status']);

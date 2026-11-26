@@ -46,6 +46,13 @@ export function CatalogFilters({ filters, facets, effects, onChange, withSearch 
         </div>
       )}
 
+      {/* Merkliste ganz oben: der häufigste Schnellfilter */}
+      <div className={styles.section}>
+        <Choice checked={!!filters.favorites} onChange={(e) => onChange({ favorites: e.target.checked })}>
+          <span className={styles.favorite}><Icon name="heart" size={18} filled={!!filters.favorites} /> Nur meine Merkliste</span>
+        </Choice>
+      </div>
+
       <div className={styles.section}>
         <label className={styles.title} htmlFor={`${uid}-producer`}>Hersteller</label>
         <Select id={`${uid}-producer`} value={filters.producer ?? ''} onChange={(e) => onChange({ producer: e.target.value })}>
@@ -107,9 +114,6 @@ export function CatalogFilters({ filters, facets, effects, onChange, withSearch 
         <div className={styles.choices}>
           <Choice checked={!!filters.available} onChange={(e) => onChange({ available: e.target.checked })}>
             Nur verfügbare Produkte
-          </Choice>
-          <Choice checked={!!filters.favorites} onChange={(e) => onChange({ favorites: e.target.checked })}>
-            Nur meine Merkliste
           </Choice>
         </div>
       </details>

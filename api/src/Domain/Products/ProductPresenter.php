@@ -43,6 +43,8 @@ final class ProductPresenter
                 'count' => (int) ($row['rating_count'] ?? 0),
             ],
             'favorite' => (bool) ($row['is_favorite'] ?? false),
+            // Erscheinungsdatum im Shop (für „Neu im Katalog“)
+            'releasedAt' => $row['source_updated_at'] ?? null,
         ];
         if ($withDetails) {
             $data += [

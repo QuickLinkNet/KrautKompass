@@ -68,12 +68,12 @@ strikte Validierung, Schreibtransaktionen mit `BEGIN IMMEDIATE`, CSP, gehärtete
 - `invites`: Code `KK-XXXX-XXXX`, Rolle, Ablaufdatum, eingelöst/widerrufen
 - `products`: aus dem Shop, eindeutig über (`source`, `external_id`). Fehlt eine Sorte im Shop,
   wird sie nur inaktiv; ihre Bewertungen bleiben erhalten
-- `ratings`: genau eine pro Benutzer und Sorte (änderbar). Skalen 1–10 (= halbe Sterne), Wirkungen
+- `ratings`: beliebig viele pro Benutzer und Sorte (Tagebuch, seit Migration 000008), jede änderbar. Skalen 1–10 (= halbe Sterne), Wirkungen
   und Nebenwirkungen als JSON-Listen aus festem Vokabular (`config/app.php` → `ratings`),
   `visibility` `private` (Standard) | `group`
 - `sync_runs`: Protokoll der Katalogabgleiche
 - `password_resets`: nur SHA-256 des Tokens, Ablauf, eingelöst (siehe Sicherheit)
-- `ratings`: eine Bewertung je Person und Sorte, dazu `quality` (Blütenqualität) und `again` (yes/maybe/no) aus Migration 000007
+- `ratings`: dazu `quality` (Blütenqualität) und `again` (yes/maybe/no) aus Migration 000007
 - `favorites`: Merkliste je Person (`user_id`, `product_id`), nur für sie selbst sichtbar
 
 Katalogsuche (`GET /api/products`): Suche, Hersteller, Terpen, THC/CBD-Spanne, Mindestbewertung, Wirkungen
@@ -106,6 +106,8 @@ JSON-Spalten werden per `instr()` gefiltert, Facetten und Top-Wirkungen in PHP b
   Desktop: Seitenleiste; darunter: Filter-Sheet (`<dialog>`). Auf dem Handy immer Listenansicht.
 - **Journal** (`pages/JournalPage`, `/bewertungen`): eigene Bewertungen und Merkliste, Filter in der URL
   (`features/journal/journalQuery`), Überblick im Browser berechnet (`journalSummary`).
+- **Neuigkeiten** (`pages/NewsPage`, `/neuigkeiten`): nur geteilte Bewertungen (`/api/ratings/feed` mit author,
+  favorites, offset), nach Tagen gruppiert (`features/feed`), dazu „Neu im Katalog“ (Sortierung newest = Erscheinungsdatum im Shop).
 - **Design-Tokens** in `src/styles/tokens.css`: Rohwerte aus `design/tokens.json` (per Test synchron
   gehalten) plus semantische Tokens, die allein in Komponenten benutzt werden. Siehe [DESIGN.md](DESIGN.md).
 - **Assets** (Logos, Fotos, Favicon, App-Icon) werden direkt aus `design/assets/` importiert – eine Quelle, kein Kopieren.

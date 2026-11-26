@@ -33,6 +33,7 @@
 .resetLink,
 .inlineButton {
   padding: 0;
+  white-space: nowrap;
   border: 0;
   background: none;
   font: inherit;

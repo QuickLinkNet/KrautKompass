@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router';
+import type { Rating } from '../api/types';
 import { Badge } from '../components/atoms/Badge/Badge';
 import { Button } from '../components/atoms/Button/Button';
 import { Icon } from '../components/atoms/Icon/Icon';
 import { Skeleton } from '../components/atoms/Skeleton/Skeleton';
 import { Alert } from '../components/molecules/Alert/Alert';
 import { GroupReport } from '../components/organisms/GroupReport/GroupReport';
-import { MyRatingCard } from '../components/organisms/MyRatingCard/MyRatingCard';
+import { MyRatings } from '../components/organisms/MyRatings/MyRatings';
 import { ProductFacts } from '../components/organisms/ProductFacts/ProductFacts';
 import { ProductHero } from '../components/organisms/ProductHero/ProductHero';
 import { RatingDialog } from '../components/organisms/RatingDialog/RatingDialog';
@@ -19,11 +21,14 @@ import styles from './ProductDetailPage.module.css';
 export function ProductDetailPage() {
   const id = Number(useParams().id);
   // Zurück zum Katalog mit den Filtern, mit denen man gekommen ist
-  const catalog = (useLocation().state as { catalog?: unknown } | null)?.catalog;
+  const state = useLocation().state as { catalog?: unknown; ratingId?: unknown } | null;
+  const catalog = state?.catalog;
   const fromCatalog = typeof catalog === 'string' && catalog.startsWith('?') ? catalog : '';
   const meta = useMeta();
   const detail = useProductDetail(id);
   const rating = useRatingRoute();
+  // Welche eigene Bewertung der Dialog bearbeitet; null = neue Bewertung. Aus dem Journal kommt die ID im Verlaufseintrag.
+  const [editId, setEditId] = useState<number | null>(typeof state?.ratingId === 'number' ? state.ratingId : null);
 
   const back = (
     <Link to={`/${fromCatalog}`} className={`${layout.backLink} ${styles.back}`}>
@@ -41,8 +46,17 @@ export function ProductDetailPage() {
     );
   }
 
-  const { product, summary, myRating, ratings } = detail.data;
-  const rateLabel = myRating ? 'Bewertung ändern' : 'Jetzt bewerten';
+  const { product, summary, myRatings, ratings } = detail.data;
+  const editing = myRatings.find((r) => r.id === editId) ?? null;
+  const rateLabel = myRatings.length > 0 ? 'Neue Bewertung' : 'Jetzt bewerten';
+  const startNew = () => {
+    setEditId(null);
+    rating.start();
+  };
+  const startEdit = (r: Rating) => {
+    setEditId(r.id);
+    rating.start();
+  };
   const effectLabel = (key: string) => labelFor(meta?.effects, key);
 
   return (
@@ -50,11 +64,11 @@ export function ProductDetailPage() {
       {back}
       {detail.favoriteError && <Alert>{detail.favoriteError}</Alert>}
       <ProductHero product={product} isFavorite={detail.isFavorite} onToggleFavorite={() => void detail.toggleFavorite()}
-        onRate={myRating ? undefined : rating.start} />
+        onRate={startNew} rateLabel={rateLabel} />
 
       <div className={styles.columns}>
         <div className={styles.column}>
-          {myRating && <MyRatingCard rating={myRating} onEdit={rating.start} />}
+          {myRatings.length > 0 && <MyRatings ratings={myRatings} onEdit={startEdit} onNew={startNew} />}
           {product.terpenes.length > 0 && (
             <section>
               <h2>Terpene</h2>
@@ -73,11 +87,11 @@ export function ProductDetailPage() {
       <RoundRatings ratings={ratings.filter((r) => r.visibility === 'group')} meta={meta} />
 
       <div className={styles.cta}>
-        <Button type="button" block onClick={rating.start}>{rateLabel}</Button>
+        <Button type="button" block onClick={startNew}>{rateLabel}</Button>
       </div>
 
       {meta && (
-        <RatingDialog open={rating.open} product={product} meta={meta} existing={myRating} onClose={rating.close}
+        <RatingDialog open={rating.open} product={product} meta={meta} existing={editing} onClose={rating.close}
           onChanged={() => void detail.reload(true)} mayClose={rating.mayClose} />
       )}
     </div>

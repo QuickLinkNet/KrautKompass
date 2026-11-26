@@ -56,6 +56,11 @@ describe('Journal-Überblick', () => {
     expect(s.top.map((r) => r.id)).toEqual([1, 2, 3]);
   });
 
+  it('zeigt jede Sorte in den Top 3 nur einmal', () => {
+    const again = rating(4, { productId: 1, productName: 'Platinum Garlic', overall: 7, consumedAt: '2026-11-20' });
+    expect(summarize([...ratings, again]).top.map((r) => r.productId)).toEqual([1, 2, 3]);
+  });
+
   it('ist ohne Bewertungen leer', () => {
     expect(summarize([])).toMatchObject({ count: 0, average: null, again: 0, topEffects: [], topMethod: null, top: [] });
   });

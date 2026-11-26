@@ -10,7 +10,7 @@ export interface JournalSummary {
   topEffects: string[];
   /** Häufigste Konsumform oder null */
   topMethod: string | null;
-  /** Beste drei Bewertungen (bei Gleichstand die neuere zuerst) */
+  /** Beste drei Sorten (je Sorte die beste eigene Bewertung, bei Gleichstand die neuere) */
   top: Rating[];
 }
 
@@ -31,6 +31,8 @@ export function summarize(ratings: Rating[]): JournalSummary {
     again: ratings.filter((r) => r.again === 'yes').length,
     topEffects: ranked(newest.flatMap((r) => r.effects)).slice(0, 3),
     topMethod: ranked(newest.flatMap((r) => (r.method ? [r.method] : [])))[0] ?? null,
-    top: [...newest].sort((a, b) => b.overall - a.overall).slice(0, 3),
+    top: [...newest].sort((a, b) => b.overall - a.overall)
+      .filter((r, i, all) => all.findIndex((x) => x.productId === r.productId) === i)
+      .slice(0, 3),
   };
 }

@@ -1,0 +1,11 @@
+/* Chips in einer Zeile, umbrechend (Chip-Optik aus ChipGroup) */
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.group > button {
+  width: auto;
+  padding-inline: var(--space-4);
+}
