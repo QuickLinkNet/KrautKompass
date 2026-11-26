@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router';
 import type { Product } from '../../../api/types';
 import { effectIcon } from '../../../features/catalog/catalogQuery';
-import { formatPercent } from '../../../utils/format';
+import { formatCannabinoid } from '../../../utils/format';
 import { Badge } from '../../atoms/Badge/Badge';
 import { Icon } from '../../atoms/Icon/Icon';
 import { IconButton } from '../../atoms/IconButton/IconButton';
@@ -51,8 +51,8 @@ export function ProductCard({ product, view = 'list', effectLabel, onToggleFavor
           </p>
         )}
         <div className={`${styles.tags} ${styles.metrics}`}>
-          <Badge tone="metric">THC {formatPercent(product.thc)}</Badge>
-          <Badge tone="metric">CBD {formatPercent(product.cbd)}</Badge>
+          <Badge tone="metric">THC {formatCannabinoid(product.thc)}</Badge>
+          <Badge tone="metric">CBD {formatCannabinoid(product.cbd)}</Badge>
           {!product.available && <span className={styles.unavailable}>derzeit nicht lieferbar</span>}
         </div>
         {product.terpenes.length > 0 && (

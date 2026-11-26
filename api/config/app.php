@@ -27,10 +27,14 @@ return [
         'instance_name' => kk_env('INSTANCE_NAME', 'KrautKompass'),
     ],
 
-    // Optionale Rechtstexte; werden unter den Auth-Seiten verlinkt, sobald gesetzt.
+    // Anbieter für Impressum und Datenschutz (/impressum, /datenschutz). Steht nur in der Server-.env,
+    // damit keine Anschrift im Repository landet. Ohne Name/Anschrift zeigen die Seiten einen Hinweis.
     'legal' => [
-        'imprint_url' => kk_env('IMPRINT_URL'),
-        'privacy_url' => kk_env('PRIVACY_URL'),
+        'name' => kk_env('IMPRINT_NAME'),
+        'street' => kk_env('IMPRINT_STREET'),
+        'city' => kk_env('IMPRINT_CITY'),
+        'email' => kk_env('IMPRINT_EMAIL'),
+        'phone' => kk_env('IMPRINT_PHONE'),
     ],
 
     // Mailversand (Passwort-Reset). Ohne Konfiguration ist der Reset deaktiviert.

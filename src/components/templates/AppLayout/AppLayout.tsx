@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router';
+import { Link, Outlet } from 'react-router';
 import { AppHeader } from '../../organisms/AppHeader/AppHeader';
 import { AppNotices } from '../../organisms/AppNotices/AppNotices';
 import styles from './AppLayout.module.css';
@@ -13,7 +13,11 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className={styles.footer}>
-        KrautKompass · privates Bewertungstagebuch · keine Werbung, keine Kaufempfehlung
+        <p>KrautKompass · privates Bewertungstagebuch · keine Werbung, keine Kaufempfehlung</p>
+        <nav className={styles.legal} aria-label="Rechtliches">
+          <Link to="/impressum">Impressum</Link>
+          <Link to="/datenschutz">Datenschutz</Link>
+        </nav>
       </footer>
     </div>
   );

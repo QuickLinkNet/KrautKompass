@@ -25,6 +25,24 @@
   font-size: var(--text-small);
 }
 
+.footer p {
+  margin: 0;
+}
+
+.legal {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-5);
+  margin-top: var(--space-2);
+}
+
+.legal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-on-primary);
+}
+
 @media (min-width: 768px) {
   .page {
     padding: var(--space-6) var(--space-6) var(--space-7);

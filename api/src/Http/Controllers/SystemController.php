@@ -43,10 +43,7 @@ final class SystemController extends Controller
             'csrfToken' => $this->session->csrfToken(),
             'user' => $installed ? $this->auth->currentUser() : null,
             'features' => ['passwordReset' => $installed && $this->passwordReset->available()],
-            'legal' => (object) array_filter([
-                'imprintUrl' => $this->safeUrl('legal.imprint_url'),
-                'privacyUrl' => $this->safeUrl('legal.privacy_url'),
-            ]),
+            'legal' => $this->legal(),
         ];
         if (!$installed) {
             $data['requirements'] = $this->installer->requirements();
@@ -88,10 +85,19 @@ final class SystemController extends Controller
         return $this->json(['user' => $this->auth->loginById($id), 'csrfToken' => $this->session->csrfToken()], 201);
     }
 
-    private function safeUrl(string $key): ?string
+    /** Anbieterangaben für Impressum/Datenschutz; leeres Objekt, solange Name oder Anschrift fehlen. */
+    private function legal(): object
     {
-        $url = (string) $this->config->get($key, '');
-        return preg_match('#^https://\S+$#', $url) === 1 ? $url : null;
+        $value = fn (string $key): ?string => trim((string) $this->config->get("legal.$key", '')) ?: null;
+        $email = $value('email');
+        $data = array_filter([
+            'name' => $value('name'),
+            'street' => $value('street'),
+            'city' => $value('city'),
+            'email' => $email !== null && filter_var($email, FILTER_VALIDATE_EMAIL) !== false ? $email : null,
+            'phone' => $value('phone'),
+        ]);
+        return isset($data['name'], $data['street'], $data['city']) ? (object) $data : (object) [];
     }
 
     /** Vokabular für Formulare: Wirkungen, Nebenwirkungen, Konsumformen, Skala. */

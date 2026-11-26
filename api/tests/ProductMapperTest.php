@@ -18,7 +18,8 @@ return [
         assert_same('enua Pharma', $row['producer']);
         assert_same(27.0, $row['thc']);
         assert_same(0, $row['irradiated']);
-        assert_same(null, $row['price']);
+        assert_true(!array_key_exists('price', $row), 'Fehlender Listenpreis darf den Detailpreis nicht löschen.');
+        assert_true(!array_key_exists('origin', $row), 'Fehlende Herkunft darf die Detailangabe nicht löschen.');
         assert_same(1, $row['available']);
         assert_same('2026-11-04T16:15:41.055Z', $row['source_updated_at']);
     },

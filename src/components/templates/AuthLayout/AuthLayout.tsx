@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useSession } from '../../../features/session/sessionContext';
+import { Link } from 'react-router';
 import { Logo } from '../../atoms/Logo/Logo';
 import { AuthHero } from '../../organisms/AuthHero/AuthHero';
 import styles from './AuthLayout.module.css';
@@ -20,7 +20,6 @@ interface AuthLayoutProps {
  * Bewusst ohne Navigation.
  */
 export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProps) {
-  const legal = useSession().status?.legal;
 
   return (
     <div className={styles.page}>
@@ -35,12 +34,10 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
           {children}
           {footer && <div className={styles.footer}>{footer}</div>}
         </div>
-        {(legal?.imprintUrl || legal?.privacyUrl) && (
-          <nav className={styles.legal} aria-label="Rechtliches">
-            {legal.imprintUrl && <a href={legal.imprintUrl} rel="noopener">Impressum</a>}
-            {legal.privacyUrl && <a href={legal.privacyUrl} rel="noopener">Datenschutz</a>}
-          </nav>
-        )}
+        <nav className={styles.legal} aria-label="Rechtliches">
+          <Link to="/impressum">Impressum</Link>
+          <Link to="/datenschutz">Datenschutz</Link>
+        </nav>
       </main>
     </div>
   );

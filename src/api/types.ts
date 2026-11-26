@@ -32,7 +32,8 @@ export interface SystemStatus {
   /** Optionale Funktionen, abhängig von der Server-Konfiguration */
   features?: { passwordReset: boolean };
   /** Nur gesetzt, wenn in der Server-Konfiguration hinterlegt */
-  legal?: { imprintUrl?: string; privacyUrl?: string };
+  /** Anbieter für Impressum/Datenschutz (aus der Server-.env), leer solange nicht gesetzt */
+  legal?: { name?: string; street?: string; city?: string; email?: string; phone?: string };
 }
 
 export interface Product {

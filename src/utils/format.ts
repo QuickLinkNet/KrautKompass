@@ -11,6 +11,15 @@ export function formatPercent(value: number | null): string {
   return value === null ? '–' : `${percent.format(value)} %`;
 }
 
+/**
+ * THC/CBD wie im Shop: Der Shop speichert „unter 1 %“ als 1 und zeigt dann „< 1 %“.
+ * Alle anderen Werte erscheinen mit einer Nachkommastelle.
+ */
+export function formatCannabinoid(value: number | null): string {
+  if (value === null) return '–';
+  return value === 1 ? '< 1,0 %' : formatPercent(value);
+}
+
 export function formatDate(iso: string | null): string {
   if (!iso) return '–';
   const parsed = new Date(iso);
@@ -24,8 +33,9 @@ export function formatLongDate(iso: string | null): string {
   return Number.isNaN(parsed.getTime()) ? '–' : longDate.format(parsed);
 }
 
-export function formatPrice(value: number | null): string | null {
-  return value === null ? null : euro.format(value);
+/** Preis pro Einheit; der Shop führt Blüten pro Gramm, daher „g“ als Rückfall. */
+export function formatPrice(value: number | null, unit = 'g'): string | null {
+  return value === null ? null : `${euro.format(value)} / ${unit}`;
 }
 
 /** Interne Skala 1–10 → „4,5“ (Sterne mit einer Nachkommastelle) */

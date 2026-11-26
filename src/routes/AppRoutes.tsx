@@ -6,6 +6,9 @@ import { Alert } from '../components/molecules/Alert/Alert';
 import { AppLayout, PageContainer } from '../components/templates/AppLayout/AppLayout';
 import { AuthLayout } from '../components/templates/AuthLayout/AuthLayout';
 import { useSession } from '../features/session/sessionContext';
+import { AccountPage } from '../pages/AccountPage';
+import { ImprintPage } from '../pages/ImprintPage';
+import { PrivacyPage } from '../pages/PrivacyPage';
 import { AdminPage } from '../pages/AdminPage';
 import { ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage, SetupPage } from '../pages/AuthPages';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
@@ -41,6 +44,8 @@ export function AppRoutes() {
 
   return (
     <Routes>
+      <Route path="/impressum" element={<ImprintPage />} />
+      <Route path="/datenschutz" element={<PrivacyPage />} />
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
       <Route path="/registrieren" element={user ? <Navigate to="/" replace /> : <RegisterPage />} />
       <Route path="/passwort-vergessen" element={user ? <Navigate to="/" replace /> : <ForgotPasswordPage />} />
@@ -53,6 +58,7 @@ export function AppRoutes() {
           <Route path="/sorten/:id" element={<ProductDetailPage />} />
           <Route path="/bewertungen" element={<MyRatingsPage />} />
           <Route path="/neuigkeiten" element={<FeedPage />} />
+          <Route path="/konto" element={<AccountPage />} />
           <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" replace />} />
         </Route>
       </Route>

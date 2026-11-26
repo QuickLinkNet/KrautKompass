@@ -12,7 +12,7 @@ interface AccountMenuProps {
   onToggle: () => void;
 }
 
-/** Initialen-Kreis in der Kopfzeile mit Name, E-Mail, App installieren und Abmelden. */
+/** Initialen-Kreis in der Kopfzeile mit Name, E-Mail, Passwort ändern, App installieren und Abmelden. */
 export function AccountMenu({ open, onToggle }: AccountMenuProps) {
   const { user, logout } = useSession();
   const navigate = useNavigate();
@@ -40,6 +40,9 @@ export function AccountMenu({ open, onToggle }: AccountMenuProps) {
         <div id="account-menu" className={styles.menu}>
           <p className={styles.name}>{user?.display_name}</p>
           <p className={styles.mail}>{user?.email}</p>
+          <button type="button" className={styles.action} onClick={() => { onToggle(); navigate('/konto'); }}>
+            <Icon name="lock" size={18} /> Passwort ändern
+          </button>
           {pwa.installable && (
             <button type="button" className={styles.action} onClick={onInstall}>
               <Icon name="download" size={18} /> App installieren

@@ -16,7 +16,7 @@ final class ProductMapper
     public static function fromListItem(array $item): array
     {
         $price = self::positiveFloat($item['price'] ?? null) ?? self::positiveFloat($item['min_price'] ?? null);
-        return [
+        $row = [
             'slug' => (string) $item['url'],
             'name' => trim((string) $item['name']),
             'category' => 'flower',
@@ -34,6 +34,14 @@ final class ProductMapper
             'active' => 1,
             'source_updated_at' => self::text($item['updated_at'] ?? $item['released_at'] ?? null),
         ];
+        // Preis und Herkunft kennt die Liste seit dem Shop-Umbau nicht mehr (nur die Detailseite):
+        // leere Werte weglassen, sonst würde jeder Abgleich die Werte aus der Detailseite löschen.
+        foreach (['price', 'origin'] as $optional) {
+            if ($row[$optional] === null) {
+                unset($row[$optional]);
+            }
+        }
+        return $row;
     }
 
     /**

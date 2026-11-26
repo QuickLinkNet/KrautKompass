@@ -1,5 +1,5 @@
 import type { ProductDetails } from '../../../api/types';
-import { formatPercent } from '../../../utils/format';
+import { formatCannabinoid } from '../../../utils/format';
 import { Badge } from '../../atoms/Badge/Badge';
 import { Button } from '../../atoms/Button/Button';
 import { Icon } from '../../atoms/Icon/Icon';
@@ -47,8 +47,8 @@ export function ProductHero({ product, isFavorite, onToggleFavorite, onRate }: P
           {average !== null && <span className={styles.count}>{count} {count === 1 ? 'Bewertung' : 'Bewertungen'}</span>}
         </p>
         <p className={styles.metrics}>
-          <span className={`${styles.metric} ${styles.thc}`}>THC <strong>{formatPercent(product.thc)}</strong></span>
-          <span className={styles.metric}>CBD <strong>{formatPercent(product.cbd)}</strong></span>
+          <span className={`${styles.metric} ${styles.thc}`}>THC <strong>{formatCannabinoid(product.thc)}</strong></span>
+          <span className={styles.metric}>CBD <strong>{formatCannabinoid(product.cbd)}</strong></span>
         </p>
         <div className={styles.actions}>
           {onRate && <Button type="button" block className={styles.rate} onClick={onRate}>Jetzt bewerten</Button>}
