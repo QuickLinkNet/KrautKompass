@@ -10,7 +10,7 @@ namespace KrautKompass\Services\Sync;
 final class ProductMapper
 {
     /**
-     * @param array<string, mixed> $item Eintrag aus /api/products
+     * @param array<string, mixed> $item Eintrag aus /api/v1/shop/products
      * @return array<string, mixed>
      */
     public static function fromListItem(array $item): array
@@ -29,38 +29,47 @@ final class ProductMapper
             'irradiated' => isset($item['irradiated']) ? (int) (bool) $item['irradiated'] : null,
             'origin' => self::text($item['origin'] ?? null),
             'price' => $price,
+            // Die Liste fragt nur den Livebestand ab (avail=1); dort steht 1 oder 4, beides ist bestellbar.
             'available' => (int) ((int) ($item['availibility'] ?? 0) > 0),
             'active' => 1,
-            'source_updated_at' => self::text($item['updated_at'] ?? null),
+            'source_updated_at' => self::text($item['updated_at'] ?? $item['released_at'] ?? null),
         ];
     }
 
     /**
-     * @param array<string, mixed> $attr attributes aus __NEXT_DATA__ der Detailseite
+     * @param array<string, mixed> $product pageContext.product aus __NEXT_DATA__ der Detailseite
      * @return array{columns: array<string, mixed>, image: ?string, thumb: ?string}
      */
-    public static function fromDetails(array $attr): array
+    public static function fromDetails(array $product): array
     {
         $terpenes = [];
-        foreach ($attr['terpenes']['data'] ?? [] as $terpene) {
-            $label = $terpene['attributes']['labelDE'] ?? null;
+        foreach ($product['cannabis']['terpenes'] ?? [] as $terpene) {
+            $label = $terpene['label'] ?? null;
             if (is_string($label) && $label !== '') {
-                $terpenes[] = ['label' => $label, 'order' => (int) ($terpene['attributes']['order'] ?? 0)];
+                $terpenes[] = ['label' => $label, 'order' => (int) ($terpene['order'] ?? 0)];
             }
         }
         usort($terpenes, static fn (array $a, array $b): int => $a['order'] <=> $b['order']);
 
+        $attributes = [];
+        foreach ($product['attributes'] ?? [] as $attribute) {
+            if (is_array($attribute) && isset($attribute['key'])) {
+                $attributes[(string) $attribute['key']] = $attribute['value'] ?? null;
+            }
+        }
+
         $columns = array_filter([
-            'short_name' => self::text($attr['shortName'] ?? null),
-            'description' => self::cleanDescription($attr['description'] ?? null),
-            'producer' => self::text($attr['producerrel']['data']['attributes']['name'] ?? null),
-            'grower' => self::text($attr['grower']['data']['attributes']['name'] ?? null),
-            'strain' => self::text($attr['strain']['data']['attributes']['name'] ?? null),
-            'price' => self::positiveFloat($attr['price'] ?? null),
+            'short_name' => self::text($product['shortName'] ?? null),
+            'description' => self::cleanDescription($product['description'] ?? null),
+            'producer' => self::text($product['manufacturer']['name'] ?? null),
+            'grower' => self::text($product['cannabis']['grower']['name'] ?? null),
+            'strain' => self::text($product['cannabis']['strain']['name'] ?? null),
+            'origin' => self::text($attributes['origin'] ?? null),
+            'price' => self::positiveFloat($product['variants'][0]['price'] ?? null),
         ], static fn (mixed $v): bool => $v !== null);
         $columns['terpenes'] = json_encode(array_column($terpenes, 'label'), JSON_UNESCAPED_UNICODE);
 
-        $image = $attr['image']['data']['attributes'] ?? null;
+        $image = $product['images'][0] ?? null;
         return [
             'columns' => $columns,
             'image' => is_array($image) ? self::text($image['url'] ?? null) : null,

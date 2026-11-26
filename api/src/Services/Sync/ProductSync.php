@@ -86,8 +86,9 @@ final class ProductSync
      */
     private function syncItem(string $source, string $externalId, array $item, bool $force, array &$stats, Closure $log): void
     {
-        $existing = $this->products->findBySource($source, $externalId);
         $columns = ProductMapper::fromListItem($item);
+        $existing = $this->products->findBySource($source, $externalId)
+            ?? $this->products->adoptBySlug($source, $columns['slug'], $externalId);
         $needsDetails = $force
             || $existing === null
             || $existing['details_synced_at'] === null
@@ -132,8 +133,16 @@ final class ProductSync
                 continue;
             }
             $this->pause();
-            $paths[$column] = $this->images->store($slug, $variant, $url, $this->client->download($url));
+            $bytes = $this->client->download($url);
+            $paths[$column] = $this->images->store($slug, $variant, $url, $bytes);
             $stats['images']++;
+            // Der Shop liefert keine kleine Variante mehr: Vorschaubild selbst erzeugen (Listen auf dem Handy)
+            if ($variant === 'image' && $mapped['thumb'] === null) {
+                $thumb = $this->images->storeThumbnail($slug, $bytes);
+                if ($thumb !== null) {
+                    $paths['thumb_path'] = $thumb;
+                }
+            }
         }
         return $paths;
     }

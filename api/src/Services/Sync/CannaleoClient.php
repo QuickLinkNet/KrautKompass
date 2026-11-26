@@ -11,10 +11,12 @@ use RuntimeException;
 /**
  * Liest den Katalog des Kraut-Kurier-Shops (Cannaleo-White-Label, Next.js).
  *
- *  - Liste:  GET /api/products?pagination[page]=N&pagination[pageSize]=50&vend=<vendor>
- *            → message.data[] mit Stammdaten, message.meta.pagination
+ * Stand 26.11.2026 (Shop-Umbau, die alte /api/products gibt 404):
+ *  - Liste:  GET /api/v1/shop/products?avail=1&category=flower&page=N&pageSize=24
+ *            → data.data[] mit Stammdaten (nur lieferbare Sorten), data.meta.pagination.
+ *            Größere Seiten als 24 lehnt der Shop mit HTTP 400 ab.
  *  - Detail: GET /product/<slug> → <script id="__NEXT_DATA__"> → props.pageProps.pageContext.product
- *            → Beschreibung, Terpene, Bild-URLs
+ *            → Beschreibung, Terpene, Herkunft, Preis, Bild-URL
  *
  * Inoffizielle Schnittstelle: ändert Cannaleo das Frontend, muss nur diese Klasse angepasst werden.
  */
@@ -32,27 +34,28 @@ class CannaleoClient
     {
         $base = rtrim($this->config->string('sync.base_url'), '/');
         $size = $this->config->int('sync.page_size');
-        $vendor = $this->config->int('sync.vendor_id');
         $all = [];
         $page = 1;
         do {
             $query = http_build_query([
-                'pagination' => ['page' => $page, 'pageSize' => $size],
-                'vend' => $vendor,
+                'avail' => 1,
+                'category' => 'flower',
+                'page' => $page,
+                'pageSize' => $size,
             ]);
-            $json = $this->decode($this->http->get("$base/api/products?$query"), 'Produktliste');
-            $message = $json['message'] ?? null;
-            if (!is_array($message) || !isset($message['data']) || !is_array($message['data'])) {
+            $json = $this->decode($this->http->get("$base/api/v1/shop/products?$query"), 'Produktliste');
+            $result = $json['data'] ?? null;
+            if (!is_array($result) || !isset($result['data']) || !is_array($result['data'])) {
                 throw new RuntimeException('Produktliste: unerwartetes Format (Cannaleo hat evtl. etwas geändert).');
             }
-            array_push($all, ...$message['data']);
-            $pageCount = (int) ($message['meta']['pagination']['pageCount'] ?? 1);
+            array_push($all, ...$result['data']);
+            $pageCount = (int) ($result['meta']['pagination']['pageCount'] ?? 1);
             $page++;
         } while ($page <= $pageCount);
         return $all;
     }
 
-    /** @return array<string, mixed>|null attributes des Produkts oder null, wenn nicht gefunden */
+    /** @return array<string, mixed>|null Produkt aus __NEXT_DATA__ oder null, wenn nicht gefunden */
     public function productDetails(string $slug): ?array
     {
         $base = rtrim($this->config->string('sync.base_url'), '/');
@@ -64,7 +67,7 @@ class CannaleoClient
             throw new RuntimeException("Detailseite $slug: keine __NEXT_DATA__ gefunden.");
         }
         $data = json_decode($m[1], true);
-        $product = $data['props']['pageProps']['pageContext']['product']['attributes'] ?? null;
+        $product = $data['props']['pageProps']['pageContext']['product'] ?? null;
         return is_array($product) ? $product : null;
     }
 

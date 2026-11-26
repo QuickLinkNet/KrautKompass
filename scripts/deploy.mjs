@@ -28,7 +28,7 @@ if (['', '/', '/html', '/html/apps'].includes(remoteBaseDir)) fail(`REMOTE_BASE_
 if (!remoteBaseDir.endsWith('/krautkompass')) fail('REMOTE_BASE_DIR muss auf "/krautkompass" enden.');
 if (env('FTP_PASSWORD') === '') fail('FTP_PASSWORD ist leer.');
 
-const deployDir = join(root, 'deploy');
+const deployDir = process.env.KK_DEPLOY_DIR ?? join(root, 'deploy');
 for (const required of ['public/index.html', 'public/index.php', 'src/bootstrap.php', 'config/app.php', '.htaccess']) {
   if (!existsSync(join(deployDir, required))) fail(`deploy/${required} fehlt – erst "npm run deploy:prepare" ausführen.`);
 }

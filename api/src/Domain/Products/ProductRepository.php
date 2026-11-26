@@ -118,6 +118,21 @@ final class ProductRepository
         );
     }
 
+    /**
+     * Übernimmt ein bekanntes Produkt mit neuer Shop-ID (gleicher Slug), damit Bewertungen und Merkliste
+     * erhalten bleiben, wenn der Shop seine IDs ändert (Umbau 11/2026).
+     * @return array<string, mixed>|null
+     */
+    public function adoptBySlug(string $source, string $slug, string $newExternalId): ?array
+    {
+        $row = $this->db->one('SELECT * FROM products WHERE source = ? AND slug = ? AND external_id <> ?', [$source, $slug, $newExternalId]);
+        if ($row === null) {
+            return null;
+        }
+        $this->db->update('products', ['external_id' => $newExternalId], ['id' => $row['id']]);
+        return [...$row, 'external_id' => $newExternalId];
+    }
+
     /** @param array<string, mixed> $data Spalten der products-Tabelle */
     public function upsert(string $source, string $externalId, array $data): int
     {

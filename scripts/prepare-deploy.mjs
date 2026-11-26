@@ -13,7 +13,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const api = join(root, 'api');
-const out = join(root, 'deploy');
+// KK_DEPLOY_DIR: anderer Ordner, z. B. lokal statt auf dem NAS (dort hängen gelöschte Ordner manchmal fest)
+const out = process.env.KK_DEPLOY_DIR ?? join(root, 'deploy');
 
 function fail(message) {
   console.error(`Deploy-Paket abgebrochen: ${message}`);

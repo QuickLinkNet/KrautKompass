@@ -57,6 +57,36 @@ class ImageStore
             throw new RuntimeException("Kein gültiges Bild: $remoteUrl");
         }
 
+        return $this->write($productSlug, $variant, $ext, $bytes);
+    }
+
+    /**
+     * Verkleinertes Vorschaubild (WebP, max. 400 px) aus einem bereits geprüften Bild.
+     * Ohne GD/WebP-Unterstützung null – dann zeigt die App das große Bild.
+     */
+    public function storeThumbnail(string $productSlug, string $bytes): ?string
+    {
+        if (!function_exists('imagewebp') || !function_exists('imagecreatefromstring')) {
+            return null;
+        }
+        $source = @imagecreatefromstring($bytes);
+        if ($source === false) {
+            return null;
+        }
+        $thumb = imagescale($source, min(400, imagesx($source)));
+        if ($thumb === false) {
+            return null;
+        }
+        imagealphablending($thumb, false);
+        imagesavealpha($thumb, true);
+        ob_start();
+        $ok = imagewebp($thumb, null, 82);
+        $webp = (string) ob_get_clean();
+        return $ok && $webp !== '' ? $this->write($productSlug, 'thumb', 'webp', $webp) : null;
+    }
+
+    private function write(string $productSlug, string $variant, string $ext, string $bytes): string
+    {
         $safeSlug = trim((string) preg_replace('/[^a-z0-9-]+/', '-', strtolower($productSlug)), '-') ?: 'produkt';
         $relative = "products/{$safeSlug}-{$variant}.{$ext}";
         $target = $this->config->string('paths.media') . '/' . $relative;

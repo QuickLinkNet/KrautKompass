@@ -71,8 +71,7 @@ return [
     'sync' => [
         'source' => 'krautkurier',
         'base_url' => 'https://krautkurier.shop',
-        'vendor_id' => 139,
-        'page_size' => 50,
+        'page_size' => 24, // Maximum der Shop-Schnittstelle
         'request_delay_ms' => 250,
         'download_images' => true,
         'user_agent' => 'KrautKompass-Sync/0.1 (+privates Bewertungsprojekt)',
