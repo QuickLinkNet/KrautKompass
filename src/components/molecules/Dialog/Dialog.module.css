@@ -1,0 +1,117 @@
+.dialog {
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+}
+
+.dialog[open] {
+  animation: appear var(--duration-base) var(--ease-out);
+}
+
+.dialog::backdrop {
+  background: var(--color-scrim);
+  opacity: 0.6;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Vollbild auf dem Handy */
+.full {
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: 100dvh;
+}
+
+.full .inner {
+  height: 100%;
+}
+
+.compact {
+  width: calc(100% - 2 * var(--space-4));
+  max-width: 460px;
+  max-height: 90dvh;
+  border-radius: var(--radius-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: calc(var(--space-2) + env(safe-area-inset-top)) var(--space-3) var(--space-2) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-h2);
+  overflow-wrap: anywhere;
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-5);
+}
+
+.footer {
+  padding: var(--space-3) var(--space-5) calc(var(--space-3) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.compact .header {
+  padding-top: var(--space-3);
+  border-bottom: 0;
+}
+
+.compact .body {
+  padding-top: 0;
+}
+
+.compact .footer {
+  border-top: 0;
+  padding: 0 var(--space-5) var(--space-5);
+}
+
+/* Querformat: Fuß nicht fest, sonst bleibt kaum Platz für den Inhalt */
+@media (max-height: 520px) {
+  .full .inner {
+    overflow-y: auto;
+  }
+
+  .full .body {
+    flex: none;
+    overflow: visible;
+  }
+}
+
+@media (min-width: 768px) {
+  .full {
+    width: min(640px, calc(100% - 2 * var(--space-6)));
+    height: auto;
+    max-height: 90dvh;
+    border-radius: var(--radius-lg);
+  }
+
+  .full .inner {
+    height: auto;
+    max-height: 90dvh;
+  }
+}
+
+@keyframes appear {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}

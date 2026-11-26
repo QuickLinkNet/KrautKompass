@@ -15,6 +15,13 @@ if (preg_match('#^/api(/|$)#', $path)) {
     return true;
 }
 if ($path !== '/' && is_file($public . $path)) {
+    // Typen, die der eingebaute PHP-Server nicht kennt, und kein Cache für Service Worker/Manifest
+    if (preg_match('#/(sw\.js|manifest\.webmanifest)$#', $path)) {
+        header('Content-Type: ' . (str_ends_with($path, '.js') ? 'text/javascript' : 'application/manifest+json'));
+        header('Cache-Control: no-cache');
+        readfile($public . $path);
+        return true;
+    }
     return false;
 }
 if (is_file($public . '/index.html')) {

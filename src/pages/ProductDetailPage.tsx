@@ -1,16 +1,19 @@
 import { Link, useLocation, useParams } from 'react-router';
-import { productApi } from '../api/endpoints';
 import { Badge } from '../components/atoms/Badge/Badge';
-import { Card } from '../components/atoms/Card/Card';
-import { Spinner } from '../components/atoms/Spinner/Spinner';
+import { Button } from '../components/atoms/Button/Button';
+import { Icon } from '../components/atoms/Icon/Icon';
+import { Skeleton } from '../components/atoms/Skeleton/Skeleton';
 import { Alert } from '../components/molecules/Alert/Alert';
-import { StatBar } from '../components/molecules/StatBar/StatBar';
-import { RatingForm } from '../components/organisms/RatingForm/RatingForm';
-import { RatingList } from '../components/organisms/RatingList/RatingList';
-import { useMeta } from '../features/meta/useMeta';
-import { useAsyncResource } from '../hooks/useAsyncResource';
+import { GroupReport } from '../components/organisms/GroupReport/GroupReport';
+import { MyRatingCard } from '../components/organisms/MyRatingCard/MyRatingCard';
+import { ProductFacts } from '../components/organisms/ProductFacts/ProductFacts';
+import { ProductHero } from '../components/organisms/ProductHero/ProductHero';
+import { RatingDialog } from '../components/organisms/RatingDialog/RatingDialog';
+import { RoundRatings } from '../components/organisms/RoundRatings/RoundRatings';
+import { labelFor, useMeta } from '../features/meta/useMeta';
+import { useProductDetail } from '../features/products/useProductDetail';
+import { useRatingRoute } from '../features/rating/useRatingRoute';
 import layout from '../styles/layout.module.css';
-import { formatStars } from '../utils/format';
 import styles from './ProductDetailPage.module.css';
 
 export function ProductDetailPage() {
@@ -19,63 +22,89 @@ export function ProductDetailPage() {
   const catalog = (useLocation().state as { catalog?: unknown } | null)?.catalog;
   const fromCatalog = typeof catalog === 'string' && catalog.startsWith('?') ? catalog : '';
   const meta = useMeta();
-  const detail = useAsyncResource(() => productApi.show(id), [id]);
+  const detail = useProductDetail(id);
+  const rating = useRatingRoute();
 
-  if (detail.loading && !detail.data) return <Spinner />;
-  if (detail.error || !detail.data) return <Alert>{detail.error ?? 'Sorte nicht gefunden.'}</Alert>;
-  const { product, myRating, ratings } = detail.data;
-  const others = ratings.filter((r) => !r.isMine);
+  const back = (
+    <Link to={`/${fromCatalog}`} className={`${layout.backLink} ${styles.back}`}>
+      <Icon name="arrowLeft" size={18} />
+      Alle Sorten
+    </Link>
+  );
 
-  const facts: [string, string | null][] = [
-    ['Hersteller', product.producer],
-    ['Strain', product.strain],
-    ['Genetik', product.dominance ? `${product.dominance} dominant (${product.genetic ?? ''})` : product.genetic],
-    ['Herkunft', product.origin],
-    ['Bestrahlung', product.irradiated === null ? null : product.irradiated ? 'bestrahlt' : 'unbestrahlt'],
-  ];
+  if (!detail.data) {
+    return (
+      <div className={styles.page}>
+        {back}
+        {detail.loading ? <DetailSkeleton /> : <DetailError message={detail.error} onRetry={() => void detail.reload()} />}
+      </div>
+    );
+  }
+
+  const { product, summary, myRating, ratings } = detail.data;
+  const rateLabel = myRating ? 'Bewertung ändern' : 'Jetzt bewerten';
+  const effectLabel = (key: string) => labelFor(meta?.effects, key);
 
   return (
-    <div className={layout.stack}>
-      <Link to={`/${fromCatalog}`} className={layout.muted}>← Alle Sorten</Link>
-      <div className={styles.top}>
-        <div className={styles.image}>
-          {product.imageUrl ? <img src={product.imageUrl} alt={product.name} /> : <span aria-hidden="true">🌿</span>}
-        </div>
-        <div className={styles.info}>
-          <h1>{product.name}</h1>
-          <p className={styles.rating}>
-            Runde: <strong>{formatStars(product.rating.average)}</strong>
-            {product.rating.count > 0 && <> · {product.rating.count} geteilte Bewertung(en)</>}
-          </p>
-          <div className={layout.row}>
-            <StatBar label="THC" value={product.thc} />
-            <StatBar label="CBD" value={product.cbd} max={20} tone="warm" />
-          </div>
-          <dl className={styles.facts}>
-            {facts.filter(([, v]) => v).map(([k, v]) => (
-              <div key={k}><dt>{k}</dt><dd>{v}</dd></div>
-            ))}
-          </dl>
+    <div className={styles.page}>
+      {back}
+      {detail.favoriteError && <Alert>{detail.favoriteError}</Alert>}
+      <ProductHero product={product} isFavorite={detail.isFavorite} onToggleFavorite={() => void detail.toggleFavorite()}
+        onRate={myRating ? undefined : rating.start} />
+
+      <div className={styles.columns}>
+        <div className={styles.column}>
+          {myRating && <MyRatingCard rating={myRating} onEdit={rating.start} />}
           {product.terpenes.length > 0 && (
-            <div className={layout.row}>{product.terpenes.map((t) => <Badge key={t} tone="accent">{t}</Badge>)}</div>
+            <section>
+              <h2>Terpene</h2>
+              <div className={styles.terpenes}>
+                {product.terpenes.map((t) => <Badge key={t} tone="effect">{t}</Badge>)}
+              </div>
+            </section>
           )}
-          {product.description && <p className={styles.description}>{product.description}</p>}
-          <a href={product.shopUrl} target="_blank" rel="noreferrer" className={layout.muted}>Im Kraut-Kurier-Shop ansehen ↗</a>
+          <GroupReport summary={summary} effectLabel={effectLabel} />
+        </div>
+        <div className={styles.column}>
+          <ProductFacts product={product} />
         </div>
       </div>
 
-      <Card>
-        <h2>{myRating ? 'Deine Bewertung' : 'Jetzt bewerten'}</h2>
-        {meta ? (
-          <RatingForm key={myRating?.updatedAt ?? 'new'} productId={product.id} meta={meta} existing={myRating}
-            onSaved={() => void detail.reload(true)} />
-        ) : <Spinner />}
-      </Card>
+      <RoundRatings ratings={ratings.filter((r) => r.visibility === 'group')} meta={meta} />
 
-      <section>
-        <h2>Bewertungen der Runde</h2>
-        <RatingList ratings={others} empty="Noch niemand hat diese Sorte mit der Runde geteilt." />
-      </section>
+      <div className={styles.cta}>
+        <Button type="button" block onClick={rating.start}>{rateLabel}</Button>
+      </div>
+
+      {meta && (
+        <RatingDialog open={rating.open} product={product} meta={meta} existing={myRating} onClose={rating.close}
+          onChanged={() => void detail.reload(true)} mayClose={rating.mayClose} />
+      )}
+    </div>
+  );
+}
+
+function DetailSkeleton() {
+  return (
+    <div className={styles.skeleton} role="status" aria-label="Sorte wird geladen">
+      <Skeleton className={styles.skeletonMedia} />
+      <div className={styles.skeletonLines}>
+        <Skeleton className={styles.skeletonTitle} />
+        <Skeleton />
+        <Skeleton />
+        <Skeleton className={styles.skeletonShort} />
+      </div>
+    </div>
+  );
+}
+
+function DetailError({ message, onRetry }: { message: string | null; onRetry: () => void }) {
+  return (
+    <div className={styles.error} role="alert">
+      <Icon name="alert" size={24} />
+      <p className={styles.errorTitle}>Sorte konnte nicht geladen werden</p>
+      {message && <p className={styles.errorText}>{message}</p>}
+      <Button type="button" onClick={onRetry}>Erneut versuchen</Button>
     </div>
   );
 }

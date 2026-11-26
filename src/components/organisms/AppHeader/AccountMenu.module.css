@@ -1,0 +1,66 @@
+.trigger {
+  display: inline-grid;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+  box-shadow: 0 0 0 3px var(--color-surface-alt);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  width: max-content;
+  min-width: 240px;
+  max-width: calc(100vw - 2 * var(--space-4));
+  padding: var(--space-4) var(--space-4) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  box-shadow: var(--shadow-raised);
+}
+
+.name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.mail {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  background: none;
+  font: inherit;
+  font-weight: 500;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}

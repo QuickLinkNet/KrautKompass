@@ -74,4 +74,37 @@ final class ProductStatsRepository
         }
         return $result;
     }
+
+    /**
+     * „Das berichtet die Runde“: nur geteilte Bewertungen, private bleiben außen vor.
+     * @return array{count: int, averages: array<string, float|null>, effects: list<array{key: string, count: int}>}
+     */
+    public function groupSummary(int $productId): array
+    {
+        $rows = $this->db->all(
+            "SELECT taste, aroma, effect, quality, effects FROM ratings WHERE visibility = 'group' AND product_id = ?",
+            [$productId],
+        );
+        $averages = [];
+        foreach (['taste', 'aroma', 'effect', 'quality'] as $key) {
+            $values = array_filter(array_column($rows, $key), static fn (mixed $v): bool => $v !== null);
+            $averages[$key] = $values === [] ? null : round(array_sum($values) / count($values), 2);
+        }
+        $counts = [];
+        foreach ($rows as $row) {
+            foreach (json_decode((string) $row['effects'], true) ?: [] as $effect) {
+                $counts[(string) $effect] = ($counts[(string) $effect] ?? 0) + 1;
+            }
+        }
+        arsort($counts);
+        return [
+            'count' => count($rows),
+            'averages' => $averages,
+            'effects' => array_map(
+                static fn (string|int $key, int $count): array => ['key' => (string) $key, 'count' => $count],
+                array_keys($counts),
+                array_values($counts),
+            ),
+        ];
+    }
 }

@@ -13,14 +13,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 74%;
+  object-position: 50% 22%;
 }
 
 .scrim {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, var(--color-scrim) 0%, var(--color-scrim-soft) 62%, transparent 100%),
+    /* bis zur Textkante dunkel genug für AA, die Blüte rechts bleibt frei */
+    linear-gradient(90deg, var(--color-scrim) 0%, var(--color-scrim) 30%, var(--color-scrim-soft) 72%, transparent 100%),
     linear-gradient(0deg, var(--color-scrim-soft) 0%, transparent 40%);
 }
 
@@ -64,11 +65,6 @@
 }
 
 @media (min-width: 768px) {
-  /* Breiteres Band = stärkere Vergrößerung: Ausschnitt mit mehr Bokeh, Blütenspitzen unten */
-  .photo {
-    object-position: 50% 60%;
-  }
-
   .content {
     padding-inline: var(--space-7);
   }
@@ -85,7 +81,7 @@
   }
 
   .photo {
-    object-position: 50% 62%;
+    object-position: 50% 45%;
   }
 
   .scrim {

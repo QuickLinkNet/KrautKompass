@@ -33,6 +33,8 @@ final class RatingPresenter
             'taste' => $int($row['taste']),
             'aroma' => $int($row['aroma']),
             'effect' => $int($row['effect']),
+            'quality' => $int($row['quality']),
+            'again' => $row['again'],
             'effects' => json_decode((string) $row['effects'], true) ?: [],
             'sideEffects' => json_decode((string) $row['side_effects'], true) ?: [],
             'method' => $row['method'],

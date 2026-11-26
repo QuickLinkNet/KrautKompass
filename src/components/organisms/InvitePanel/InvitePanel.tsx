@@ -37,7 +37,7 @@ export function InvitePanel() {
     }
   };
 
-  const link = (code: string) => `${window.location.origin}/registrieren?code=${code}`;
+  const link = (code: string) => `${window.location.origin}${import.meta.env.BASE_URL}registrieren?code=${code}`;
 
   return (
     <Card className={layout.stack}>

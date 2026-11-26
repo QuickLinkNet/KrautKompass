@@ -42,7 +42,8 @@ export function buildUrl(path: string, query?: Query): string {
     }
   }
   const qs = params.toString();
-  return `/api${path}${qs ? `?${qs}` : ''}`;
+  // BASE_URL endet immer auf "/" und enthält den Unterordner, falls die App in einem liegt.
+  return `${import.meta.env.BASE_URL}api${path}${qs ? `?${qs}` : ''}`;
 }
 
 async function send(method: Method, url: string, body: unknown, timeoutMs: number): Promise<Response> {

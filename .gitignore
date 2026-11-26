@@ -6,6 +6,9 @@ dist/
 api/public/index.html
 api/public/assets/
 api/public/favicon.svg
+api/public/sw.js
+api/public/manifest.webmanifest
+api/public/apple-touch-icon.png
 
 # Laufzeitdaten (werden vom Installer erzeugt)
 api/storage/*
@@ -18,6 +21,7 @@ api/public/media/*
 # Lokale Konfiguration
 api/config/local.php
 api/.env
+api/.env.production
 .env.deploy
 deploy/
 .env.local

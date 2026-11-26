@@ -2,6 +2,8 @@
 
 export type Role = 'admin' | 'member';
 export type Visibility = 'private' | 'group';
+/** „Würdest du sie wieder nehmen?“ */
+export type Again = 'yes' | 'maybe' | 'no';
 
 export interface User {
   id: number;
@@ -77,6 +79,9 @@ export interface Rating {
   taste: number | null;
   aroma: number | null;
   effect: number | null;
+  /** Blütenqualität, Skala wie die übrigen Einzelwerte */
+  quality: number | null;
+  again: Again | null;
   effects: string[];
   sideEffects: string[];
   method: string | null;
@@ -87,11 +92,20 @@ export interface Rating {
   updatedAt: string;
 }
 
+/** „Das berichtet die Runde“ – nur aus geteilten Bewertungen */
+export interface GroupSummary {
+  count: number;
+  averages: Record<'taste' | 'aroma' | 'effect' | 'quality', number | null>;
+  effects: { key: string; count: number }[];
+}
+
 export interface RatingInput {
   overall: number;
   taste?: number | null;
   aroma?: number | null;
   effect?: number | null;
+  quality?: number | null;
+  again?: Again | null;
   effects?: string[];
   side_effects?: string[];
   method?: string | null;

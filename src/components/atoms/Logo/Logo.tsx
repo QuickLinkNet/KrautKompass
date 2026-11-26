@@ -9,14 +9,14 @@ interface LogoProps {
   className?: string;
 }
 
-/** Wort-Bild-Marke aus dem Design-Kit (design/assets/logo*.svg, Seitenverhältnis 609:90). */
+/** Wort-Bild-Marke aus dem Design-Kit (design/assets/logo*.svg, Seitenverhältnis 952:201). */
 export function Logo({ size = 'md', tone = 'default', className }: LogoProps) {
   return (
     <img
       src={tone === 'light' ? logoWhiteUrl : logoUrl}
       alt="KrautKompass"
-      width={609}
-      height={90}
+      width={952}
+      height={201}
       className={[styles.logo, styles[size], className].filter(Boolean).join(' ')}
       decoding="async"
     />

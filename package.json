@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/dev.mjs",
+    "dev:live": "node scripts/dev.mjs --live",
     "api": "php -S 127.0.0.1:8095 -t api/public api/dev-router.php",
     "build": "tsc -b && node scripts/clean-public.mjs && vite build",
     "preview": "vite preview",
@@ -12,8 +13,8 @@
     "test": "vitest run",
     "test:api": "php api/tests/run.php",
     "check": "npm run typecheck && npm test && npm run test:api",
-    "deploy:prepare": "node scripts/prepare-deploy.mjs",
-    "predeploy": "npm run check && npm run build && npm run deploy:prepare",
+    "deploy:prepare": "node scripts/build-deploy.mjs",
+    "predeploy": "npm run check && npm run deploy:prepare",
     "deploy": "node scripts/deploy.mjs"
   },
   "dependencies": {

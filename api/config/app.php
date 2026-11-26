@@ -48,7 +48,7 @@ return [
         'logs' => KK_ROOT . '/storage/logs',
         'migrations' => KK_ROOT . '/database/migrations',
         'media' => KK_ROOT . '/public/media',
-        'media_url' => '/media',
+        'media_url' => kk_base_path() . '/media',
     ],
 
     'session' => [

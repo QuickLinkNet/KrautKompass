@@ -94,6 +94,7 @@ final class ProductController extends Controller
 
         return $this->json([
             'product' => $this->presenter->present($row, true),
+            'summary' => $this->stats->groupSummary((int) $row['id']),
             'myRating' => $mine[0] ?? null,
             'ratings' => $ratings,
         ]);

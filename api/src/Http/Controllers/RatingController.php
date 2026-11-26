@@ -38,6 +38,8 @@ final class RatingController extends Controller
             'taste' => "int|min:1|max:$max",
             'aroma' => "int|min:1|max:$max",
             'effect' => "int|min:1|max:$max",
+            'quality' => "int|min:1|max:$max",
+            'again' => 'string|in:yes,maybe,no',
             'effects' => 'array|max:12',
             'side_effects' => 'array|max:12',
             'method' => "string|in:$methods",

@@ -1,0 +1,40 @@
+.card {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+}
+
+.effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scores {
+  margin: 0;
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+}
+
+.score + .score {
+  border-top: 1px solid var(--color-border);
+}
+
+.score dt {
+  font-weight: 500;
+}
+
+.score dd {
+  margin: 0;
+}

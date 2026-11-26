@@ -9,7 +9,8 @@
 | `design/screens/01-login/design-spec.md`, `acceptance-criteria.md` | Spezifikation und Abnahme |
 | `design/design-system.md`, `design/IMPLEMENTIERUNG.md` | Leitlinien der Design-KI |
 | `design/assets/` | Logos (SVG/PNG), Favicon, App-Icon, Hintergrundfotos (WebP) |
-| `design/asset-board.png` | ergänzend, **nicht** maßgeblich fürs Layout |
+| `design/marke/` | Auftrag an die Design-KI für Logo und Fotos, gelieferte Originale, Abnahmebilder |
+| `design/asset-board.png` | ergänzend, **nicht** maßgeblich fürs Layout (der Kompassring daraus wird nicht verwendet) |
 
 Weitere Screens werden vom Design separat geliefert und nicht eigenständig gestaltet.
 
@@ -69,10 +70,10 @@ Neue Icons kommen in `src/components/atoms/Icon/icons.tsx`, keine Icon-Bibliothe
 
 ## Auth-Screens (umgesetzt)
 
-- **Desktop ≥ 1024 px**: Split 52 : 48. Links Foto mit CSS-Verlauf, weißes Logo, Claim
+- **Desktop ≥ 1024 px**: Split 52 : 48. Links Foto (Hochformat) mit CSS-Verlauf, weißes Logo, Claim
   „Bewerten. Verstehen. Entdecken.“, Goldlinie, Unterzeile; das Foto bleibt beim Scrollen stehen.
   Rechts Creme, Formular zentriert.
-- **Tablet / Handy**: Kopf mit Logo (keine Navigation), Bildband 200–240 px mit Claim, Formular als Karte
+- **Tablet / Handy**: Kopf mit Logo (keine Navigation), Bildband 200–240 px mit Claim auf dem Querformat-Foto, Formular als Karte
   mit gerundeten Ecken darüber. Safe Areas (iPhone-Notch/Home-Indicator) berücksichtigt.
 - Login, Registrierung, Einrichtung, Passwort vergessen, neues Passwort nutzen dasselbe Template.
 - Rechtstexte (Impressum/Datenschutz) erscheinen automatisch, sobald `legal.*` konfiguriert ist.
@@ -86,7 +87,19 @@ Referenz: `design/screens/02-sortenkatalog/reference.webp`, Abnahme im Unterordn
 - **Desktop ≥ 1024 px**: Kopf mit Navigation (Sortenkatalog, Journal, Neuigkeiten, Verwaltung) und Konto-Menü,
   grünes Kopfband mit Foto, Filter-Seitenleiste (klebt beim Scrollen), Trefferzahl, Sortierung, Listen-/Kachelansicht,
   aktive Filter als Chips. Karte: Bild, Name (Playfair), Hersteller, THC/CBD, Terpene, Wirkungen, Sterne, Merken, „Details ansehen“.
-- **Tablet**: Burger-Menü, Filter als Sheet, Pfeil im Kreis statt Button.
+- **Kopfzeile** (nach Screen 03): Initialen-Kreis öffnet überall das Konto-Menü. Tablet zeigt die Navigation in einer zweiten Zeile, nur das Handy hat einen Burger.
+- **Tablet**: Filter als Sheet, Pfeil im Kreis statt Button.
 - **Handy**: Suche über der Liste, „Filter (n)“ + Sortierung, kompakte Karte, Wirkungen über die volle Breite.
 - Bewertungen erscheinen wie überall in der App als Sterne von 5 (interne Skala 1–10 ÷ 2).
 - Breiter Inhalt: `--content-width-wide` (1360 px).
+
+## Sorte & Bewertung (umgesetzt)
+
+Referenz: `design/screens/03-sorte-bewertung/`, Abnahme im Unterordner `abnahme/`.
+
+- **Sortenseite:** Foto mit `mix-blend-mode: multiply`, damit der weiße Shop-Hintergrund zur Kartenfläche wird. „Jetzt bewerten“
+  liegt auf dem Handy fest unten; wer schon bewertet hat, sieht nur „Bewertung ändern“.
+- **Bewerten:** `RatingDialog` (Vollbild auf dem Handy, sonst Dialog). Eigener Verlaufseintrag (`useRatingRoute`), damit die
+  Zurück-Geste den Dialog schließt und bei Änderungen nachfragt.
+- **`StarInput`:** halbe Sterne durch Tippen/Wischen, darunter ein echtes `range`-Feld für Tastatur und Screenreader.
+- **Auswahl** nie nur über Farbe: Häkchen plus Fläche (`ChipGroup`, `SegmentedChoice`).

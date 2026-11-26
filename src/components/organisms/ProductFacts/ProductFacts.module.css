@@ -1,0 +1,76 @@
+.facts {
+  margin: 0;
+}
+
+.fact {
+  display: grid;
+  grid-template-columns: minmax(110px, 2fr) 3fr;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  font-size: var(--text-small);
+}
+
+.fact + .fact {
+  border-top: 1px solid var(--color-border);
+}
+
+.fact dt {
+  font-weight: 600;
+}
+
+.fact dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.clamped {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
+.more {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.shop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 34%, var(--color-background));
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shop:hover {
+  background: color-mix(in srgb, var(--color-accent) 50%, var(--color-background));
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

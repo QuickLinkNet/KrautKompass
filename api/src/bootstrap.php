@@ -22,6 +22,20 @@ spl_autoload_register(static function (string $class): void {
 });
 
 /**
+ * Unterordner, unter dem die App aufgerufen wird ('' oder z. B. '/apps/krautkompass').
+ * Ergibt sich aus dem Ort von public/index.php – nicht aus Angaben des Browsers.
+ */
+function kk_base_path(?string $scriptName = null): string
+{
+    $script = $scriptName ?? (string) ($_SERVER['SCRIPT_NAME'] ?? '');
+    if (PHP_SAPI === 'cli' && $scriptName === null || !str_ends_with($script, '/index.php')) {
+        return '';
+    }
+    $dir = substr($script, 0, -strlen('/index.php'));
+    return str_ends_with($dir, '/public') ? substr($dir, 0, -strlen('/public')) : $dir;
+}
+
+/**
  * Server-Werte aus Umgebungsvariablen oder api/.env (KEY=VALUE, # Kommentare).
  * Echte Umgebungsvariablen haben Vorrang. Leere Werte gelten als nicht gesetzt.
  */

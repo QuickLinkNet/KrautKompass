@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+import { SYSTEM_ICONS } from './iconsSystem';
 
 /**
  * Lokale Linien-Icons (24×24, Kontur in currentColor). Bewusst klein gehalten:
@@ -122,8 +123,51 @@ export const ICONS = {
       <path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.6a3.2 3.2 0 0 1 0 5.8M17.5 14.2A5.5 5.5 0 0 1 20.5 19" />
     </>
   ),
-  shield: <path d="M12 3.5 5 6v5.5c0 4.2 3 7.7 7 9 4-1.3 7-4.8 7-9V6l-7-2.5Z" />,
+  news: (
+    <>
+      <path d="M4 5h12.5v12.5a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2V5Z" />
+      <path d="M16.5 9H20v8.5a1.75 1.75 0 0 1-3.5 0M7.5 8.5H13M7.5 12H13M7.5 15.5h3" />
+    </>
+  ),
+  settings: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M10.3 3.5h3.4l.5 2.4 1.7 1 2.3-.8 1.7 2.9-1.8 1.6v2.8l1.8 1.6-1.7 2.9-2.3-.8-1.7 1-.5 2.4h-3.4l-.5-2.4-1.7-1-2.3.8L4.1 15l1.8-1.6v-2.8L4.1 9l1.7-2.9 2.3.8 1.7-1 .5-2.4Z" />
+    </>
+  ),
+  tick: <path d="m5 12.5 4.5 4.5L19 7.5" />,
+  reset: <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.5H15" />,
+  externalLink: <path d="M7 17 17 7M9 7h8v8" />,
+  calendar: (
+    <>
+      <rect x="4" y="5.5" width="16" height="15" rx="2" />
+      <path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" />
+    </>
+  ),
+  vaporizer: (
+    <>
+      <rect x="8" y="8" width="8" height="12.5" rx="2" />
+      <path d="M10.5 8V4.5h3V8M12 13v.01M12 16.5v.01" />
+    </>
+  ),
+  joint: <path d="m4 20 1.5-3.5L15 7l2 2-9.5 9.5L4 20ZM17.5 6.5c0-1.5 1.5-1.5 1.5-3" />,
+  bong: <path d="M10 3.5h4M10.5 3.5v7L6.4 17a2.3 2.3 0 0 0 2 3.5h7.2a2.3 2.3 0 0 0 2-3.5l-4.1-6.5v-7M7.8 15h8.4M14 12l3.5-3.5" />,
+  pipe: <path d="M3.5 8.5h3c2.5 0 3.5 5 7 5V10H20v3.5c0 3-2 5-5 5-5 0-5.5-6.5-8.5-6.5h-3v-3.5Z" />,
+  edible: (
+    <>
+      <path d="M20 12a8 8 0 1 1-8-8c0 2 1.2 3.2 3 3.2 0 2 1.2 3 3 3 .3 1 .9 1.6 2 1.8Z" />
+      <path d="M9 10v.01M9.5 15v.01M14 14.5v.01" />
+    </>
+  ),
+  dots: (
+    <>
+      <circle cx="6" cy="12" r="1.2" />
+      <circle cx="12" cy="12" r="1.2" />
+      <circle cx="18" cy="12" r="1.2" />
+    </>
+  ),
   logOut: <path d="M14 4.5H6.5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2H14M10 12h10m-3.5-3.5L20 12l-3.5 3.5" />,
+  ...SYSTEM_ICONS,
 } satisfies Record<string, ReactElement>;
 
 export type IconName = keyof typeof ICONS;

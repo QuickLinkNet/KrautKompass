@@ -3,6 +3,10 @@
 const percent = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const date = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
+const longDate = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
+const euro = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
+const oneDigit = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
 export function formatPercent(value: number | null): string {
   return value === null ? '–' : `${percent.format(value)} %`;
 }
@@ -11,6 +15,28 @@ export function formatDate(iso: string | null): string {
   if (!iso) return '–';
   const parsed = new Date(iso);
   return Number.isNaN(parsed.getTime()) ? '–' : date.format(parsed);
+}
+
+/** „08. Jan. 2025“ */
+export function formatLongDate(iso: string | null): string {
+  if (!iso) return '–';
+  const parsed = new Date(iso);
+  return Number.isNaN(parsed.getTime()) ? '–' : longDate.format(parsed);
+}
+
+export function formatPrice(value: number | null): string | null {
+  return value === null ? null : euro.format(value);
+}
+
+/** Interne Skala 1–10 → „4,5“ (Sterne mit einer Nachkommastelle) */
+export function formatStarValue(score: number): string {
+  return oneDigit.format(score / 2);
+}
+
+/** „Anna Schmidt“ → „AS“ */
+export function initials(name: string | null | undefined): string {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '')).toUpperCase() || '?';
 }
 
 /** Interne Skala 1–10 → Sterne 0,5–5 */

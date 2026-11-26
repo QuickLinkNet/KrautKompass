@@ -1,66 +1,120 @@
-.top {
+.page {
   display: grid;
-  grid-template-columns: minmax(240px, 400px) 1fr;
-  gap: var(--space-6);
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
 }
 
-.image {
+.back {
+  min-height: 44px;
+  color: var(--color-text);
+}
+
+.columns,
+.column {
   display: grid;
-  place-items: center;
-  aspect-ratio: 1;
-  padding: var(--space-5);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 4rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-content: start;
 }
 
-.image img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.column:empty {
+  display: none;
 }
 
-.info {
+.terpenes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Handy: Hauptaktion bleibt am unteren Rand sichtbar, endet aber vor der Fußzeile */
+.cta {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin: 0 calc(-1 * var(--space-4));
+  padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.skeleton {
   display: grid;
   gap: var(--space-4);
 }
 
-.rating {
-  margin: 0;
-  color: var(--color-primary);
+.skeletonMedia {
+  aspect-ratio: 6 / 5;
 }
 
-.facts {
+.skeletonLines {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: var(--space-3);
+  align-content: start;
+}
+
+.skeletonTitle {
+  min-height: 36px;
+}
+
+.skeletonShort {
+  width: 60%;
+}
+
+.error {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  text-align: center;
+}
+
+.errorTitle,
+.errorText {
   margin: 0;
 }
 
-.facts dt {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
+.errorTitle {
+  font-weight: 600;
 }
 
-.facts dd {
-  margin: 0;
-  font-weight: 500;
+.errorText {
+  font-size: var(--text-small);
+  color: var(--color-text);
 }
 
-.description {
-  margin: 0;
-  white-space: pre-line;
-  color: var(--color-text-muted);
-}
-
-@media (max-width: 760px) {
-  .top {
-    grid-template-columns: 1fr;
+@media (min-width: 768px) {
+  .page,
+  .columns,
+  .column {
+    gap: var(--space-5);
   }
 
-  .image {
-    max-width: 360px;
+  .cta {
+    display: none;
+  }
+
+  .skeleton {
+    grid-template-columns: minmax(220px, 5fr) 7fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  /* Ohne Terpene, eigene Bewertung und Auswertung nutzt der Steckbrief die volle Breite */
+  .columns:has(.column:empty) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .skeleton {
+    grid-template-columns: 380px 1fr;
   }
 }

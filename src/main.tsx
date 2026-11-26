@@ -5,9 +5,13 @@ import '@fontsource-variable/inter/wght.css';
 import '@fontsource-variable/playfair-display/wght.css';
 import './styles/global.css';
 import { App } from './App';
+import { initPwa } from './features/pwa/pwa';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('#root fehlt in index.html');
+
+// Vor dem Rendern: Das Installations-Angebot des Browsers kommt sehr früh.
+initPwa();
 
 createRoot(root).render(
   <StrictMode>

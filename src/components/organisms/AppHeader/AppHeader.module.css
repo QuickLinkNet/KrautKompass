@@ -24,16 +24,18 @@
 .inner {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   width: 100%;
   max-width: var(--content-width-wide);
   min-height: var(--header-height);
   margin: 0 auto;
+  /* Burger hat Innenabstand: so stehen die Striche fast auf der Inhaltskante */
   padding: 0 var(--space-2) 0 var(--space-4);
 }
 
 .brand {
   display: inline-flex;
+  min-width: 0;
   margin-right: auto;
   padding: var(--space-2) 0;
   border-radius: var(--radius-sm);
@@ -44,7 +46,17 @@
   outline-offset: 2px;
 }
 
-/* ---- Desktop-Navigation ---- */
+.account {
+  position: relative;
+  display: inline-flex;
+}
+
+.burger svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ---- Navigation ---- */
 .nav {
   display: none;
 }
@@ -53,21 +65,17 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 44px;
   font-size: var(--text-small);
   font-weight: 500;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   text-decoration: none;
-  border-radius: var(--radius-sm);
-}
-
-.link:hover {
-  color: var(--color-primary);
+  white-space: nowrap;
 }
 
 .link:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
 }
 
 .active {
@@ -75,180 +83,99 @@
   font-weight: 600;
 }
 
-/* ---- Konto ---- */
-.account {
-  position: relative;
-  display: none;
-}
-
-.accountButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 0 var(--space-2);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: none;
-  color: var(--color-text-muted);
-  cursor: pointer;
-}
-
-.accountButton:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
-}
-
-.avatar {
-  display: inline-grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  font-size: var(--text-small);
-  font-weight: 600;
-}
-
-.accountMenu {
-  position: absolute;
-  top: calc(100% + var(--space-2));
-  right: 0;
-  min-width: 240px;
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-background);
-  box-shadow: var(--shadow-raised);
-}
-
-.accountName {
-  margin: 0;
-  font-weight: 600;
-}
-
-.accountMail {
-  margin: 0 0 var(--space-3);
-  font-size: var(--text-small);
-  color: var(--color-text-muted);
-  overflow-wrap: anywhere;
-}
-
-.menuAction {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: 100%;
-  min-height: 44px;
-  padding: 0 var(--space-2);
-  border: 0;
-  border-top: 1px solid var(--color-border);
-  background: none;
-  font: inherit;
-  font-weight: 500;
-  color: var(--color-primary);
-  cursor: pointer;
-}
-
-.menuAction:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: -2px;
-}
-
-/* ---- Mobil: Burger-Menü ---- */
+/* ---- Handy: Burger-Menü ---- */
 .mobileMenu {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
   display: grid;
-  gap: var(--space-2);
   max-height: calc(100dvh - var(--header-height));
   overflow-y: auto;
-  padding: var(--space-3) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+  padding: var(--space-2) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
   background: var(--color-background);
   box-shadow: var(--shadow-raised);
 }
 
-.mobileNav {
-  display: grid;
-}
-
-.mobileNav .link {
-  min-height: 48px;
-  padding: 0 var(--space-2);
+.mobileMenu .link {
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
   font-size: var(--text-body);
 }
 
-.mobileNav .active {
+.mobileMenu .active {
   background: var(--color-surface-alt);
 }
 
-.mobileUser {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-2) var(--space-2);
-  border-top: 1px solid var(--color-border);
-}
-
-.mobileUserText {
-  display: grid;
-  min-width: 0;
-  font-size: var(--text-small);
-}
-
-.mobileUserText span {
-  color: var(--color-text-muted);
-  overflow-wrap: anywhere;
-}
-
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-@media (min-width: 1024px) {
+/* ---- Tablet: Navigation in zweiter Zeile ---- */
+@media (min-width: 768px) {
   .inner {
-    gap: var(--space-6);
+    flex-wrap: wrap;
+    row-gap: 0;
     padding: 0 var(--space-6);
   }
 
-  .brand {
-    margin-right: var(--space-4);
+  .brand,
+  .account {
+    margin-block: var(--space-2);
   }
 
   .nav {
+    order: 1;
     display: flex;
-    align-items: stretch;
-    align-self: stretch;
     gap: var(--space-6);
-    margin-right: auto;
+    width: 100%;
   }
 
   .nav .link {
-    min-height: var(--header-height);
-    border-bottom: 2px solid transparent;
-    border-radius: 0;
+    min-height: 48px;
+    border-top: 3px solid transparent; /* hält die Schrift trotz Unterstrich mittig */
+    border-bottom: 3px solid transparent;
   }
 
-  .nav .active {
+  .nav .link:hover {
+    border-bottom-color: var(--color-accent);
+  }
+
+  .nav .active,
+  .nav .active:hover {
     border-bottom-color: var(--color-primary);
-  }
-
-  .account {
-    display: block;
   }
 
   .burger,
   .mobileMenu {
     display: none;
+  }
+}
+
+/* ---- Desktop: alles in einer Zeile ---- */
+@media (min-width: 1024px) {
+  .inner {
+    flex-wrap: nowrap;
+    gap: var(--space-6);
+  }
+
+  .brand {
+    flex: none;
+    margin-right: var(--space-4);
+  }
+
+  .brand,
+  .account {
+    margin-block: 0;
+  }
+
+  .nav {
+    order: 0;
+    width: auto;
+    margin-right: auto;
+  }
+
+  .nav .link {
+    min-height: var(--header-height);
   }
 }

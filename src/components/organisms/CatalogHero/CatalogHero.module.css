@@ -6,17 +6,17 @@
   color: var(--color-on-dark);
 }
 
-/* Foto rechts, läuft nach links in das Grün aus */
+/* Foto rechts, läuft nach links in das Grün aus. Die Blüte sitzt im oberen Bilddrittel. */
 .photo {
   position: absolute;
   inset: 0 0 0 auto;
   z-index: -1;
-  width: 62%;
+  width: 56%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 74%;
-  -webkit-mask-image: linear-gradient(to right, transparent, var(--color-primary) 45%);
-  mask-image: linear-gradient(to right, transparent, var(--color-primary) 45%);
+  object-position: 78% 12%;
+  -webkit-mask-image: linear-gradient(to right, transparent, var(--color-primary) 55%);
+  mask-image: linear-gradient(to right, transparent, var(--color-primary) 55%);
 }
 
 .inner {
@@ -53,6 +53,9 @@
 @media (min-width: 768px) {
   .photo {
     width: 55%;
+    object-position: 60% 12%;
+    -webkit-mask-image: linear-gradient(to right, transparent, var(--color-primary) 45%);
+    mask-image: linear-gradient(to right, transparent, var(--color-primary) 45%);
   }
 
   .inner {
@@ -68,8 +71,8 @@
 
 @media (min-width: 1024px) {
   .photo {
-    width: 50%;
-    object-position: 50% 70%;
+    width: 44%;
+    object-position: 50% 12%;
   }
 
   .inner {

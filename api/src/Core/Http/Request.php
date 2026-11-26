@@ -49,6 +49,10 @@ final class Request
         }
 
         $path = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/';
+        $base = kk_base_path();
+        if ($base !== '' && str_starts_with($path, $base . '/')) {
+            $path = substr($path, strlen($base));
+        }
         $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || ($trustProxy && ($headers['x-forwarded-proto'] ?? '') === 'https');
         $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');

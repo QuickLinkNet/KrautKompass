@@ -6,10 +6,19 @@
   white-space: nowrap;
 }
 
+.sm {
+  gap: 6px;
+}
+
+.lg {
+  gap: var(--space-3);
+  font-size: var(--text-body);
+}
+
 .stars {
   position: relative;
   display: inline-flex;
-  color: var(--color-gold);
+  color: var(--color-primary);
 }
 
 .track,
@@ -25,12 +34,16 @@
 }
 
 .star {
-  color: var(--color-gold);
+  color: var(--color-primary);
 }
 
 .value {
   font-weight: 600;
   color: var(--color-text);
+}
+
+.unit {
+  font-weight: 400;
 }
 
 .count {

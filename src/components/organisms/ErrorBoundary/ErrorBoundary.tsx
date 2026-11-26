@@ -22,7 +22,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
     if (!this.state.error) return this.props.children;
     return (
       <AuthLayout title="Da ist etwas schiefgelaufen" subtitle="Die Seite konnte nicht angezeigt werden.">
-        <Button block onClick={() => window.location.assign('/')}>Neu laden</Button>
+        <Button block onClick={() => window.location.assign(import.meta.env.BASE_URL)}>Neu laden</Button>
       </AuthLayout>
     );
   }

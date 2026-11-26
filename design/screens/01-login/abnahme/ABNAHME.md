@@ -38,11 +38,11 @@ Safe Areas, `100dvh`, Apple-Touch-Icon, passende `autocomplete`-Werte für den S
 
 ## Offene Punkte
 
-1. **Bildqualität:** Die Fotos sind laut Kit hochskalierte Ausschnitte. Auf Tablets und Retina-Displays
+1. ~~**Bildqualität:** Die Fotos sind laut Kit hochskalierte Ausschnitte. Auf Tablets und Retina-Displays
    ist die Blüte sichtbar pixelig. `login-mobile.webp` wird deshalb nicht verwendet (noch unschärfer);
-   alle Breakpoints nutzen `login-desktop.webp` mit angepasstem Ausschnitt. → Bitte echtes HD-Foto (≥ 2400 px) nachliefern.
-2. **Logo-Schrift:** Die SVG-Wortmarke ist eine fette Serif-Nachzeichnung, in der Referenz wirkt sie leichter.
-   Verwendet wird unverändert das gelieferte Asset.
+   alle Breakpoints nutzen `login-desktop.webp` mit angepasstem Ausschnitt. → Bitte echtes HD-Foto (≥ 2400 px) nachliefern.~~ Erledigt am 26.11.2026 mit neuen, nativ erzeugten Fotos (`design/marke/`).
+2. ~~**Logo-Schrift:** Die SVG-Wortmarke ist eine fette Serif-Nachzeichnung, in der Referenz wirkt sie leichter.
+   Verwendet wird unverändert das gelieferte Asset.~~ Erledigt am 26.11.2026, neues Logo.
 3. **Mailversand für den Reset** muss auf dem Server konfiguriert werden (`app.url`, `mail.transport`, `mail.from`).
    Ohne Konfiguration erklärt die Seite, dass der Reset nicht eingerichtet ist (keine vorgetäuschte Funktion).
 4. **Admin-Reset als Fallback** fehlt noch (wenn kein Mailversand möglich ist).

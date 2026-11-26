@@ -37,7 +37,7 @@ final class Session
         ini_set('session.use_strict_mode', '1');
         session_set_cookie_params([
             'lifetime' => $lifetime,
-            'path' => '/',
+            'path' => kk_base_path() . '/',
             'secure' => $secure,
             'httponly' => true,
             'samesite' => 'Lax',

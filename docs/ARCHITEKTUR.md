@@ -73,12 +73,13 @@ strikte Validierung, Schreibtransaktionen mit `BEGIN IMMEDIATE`, CSP, gehärtete
   `visibility` `private` (Standard) | `group`
 - `sync_runs`: Protokoll der Katalogabgleiche
 - `password_resets`: nur SHA-256 des Tokens, Ablauf, eingelöst (siehe Sicherheit)
+- `ratings`: eine Bewertung je Person und Sorte, dazu `quality` (Blütenqualität) und `again` (yes/maybe/no) aus Migration 000007
 - `favorites`: Merkliste je Person (`user_id`, `product_id`), nur für sie selbst sichtbar
 
 Katalogsuche (`GET /api/products`): Suche, Hersteller, Terpen, THC/CBD-Spanne, Mindestbewertung, Wirkungen
 (ODER, laut Gruppenbewertungen), verfügbar, Merkliste; Sortierung nur über eine Whitelist. Listen in
 JSON-Spalten werden per `instr()` gefiltert, Facetten und Top-Wirkungen in PHP berechnet
-(`ProductStatsRepository`) – der Webspace hat SQLite 3.7.17 ohne JSON-Funktionen.
+(`ProductStatsRepository`) – das SQL bleibt mit SQLite 3.7.17 verträglich (kein JSON1).
 - `settings`, `login_attempts`, `rate_limits`
 
 ## Produkt-Sync
@@ -97,8 +98,8 @@ JSON-Spalten werden per `instr()` gefiltert, Facetten und Top-Wirkungen in PHP b
 ## Frontend
 
 - **Atomic Design:** `atoms` (Icon, Logo, Button/ButtonLink, IconButton, Input, Choice, Divider, Badge, RatingStars,
-  Card, Spinner) → `molecules` (FormField, PasswordField, Alert, SearchField, RangeField, FilterChip, Sheet, StatBar,
-  ChipGroup, ScoreInput) → `organisms` (AppHeader, AuthHero, CatalogHero, CatalogFilters, CatalogToolbar,
+  Avatar, Card, Skeleton, Spinner) → `molecules` (FormField, PasswordField, Alert, SearchField, RangeField, FilterChip, Sheet, Dialog, ConfirmDialog,
+  ChipGroup, StarInput, SegmentedChoice, Disclosure) → `organisms` (ProductHero, MyRatingCard, GroupReport, ProductFacts, RoundRatings, RatingDialog, AppHeader, AuthHero, CatalogHero, CatalogFilters, CatalogToolbar,
   ProductCard, Formulare, Panels) → `templates` (AuthLayout, AppLayout + PageContainer) → `pages`
 - **Sortenkatalog** (`pages/ProductsPage`, Startseite `/`): Filter stehen in der URL (`features/catalog/catalogQuery`,
   teilbar, Zurück-Taste funktioniert), `useCatalog` lädt seitenweise und schaltet die Merkliste optimistisch um.
@@ -106,6 +107,8 @@ JSON-Spalten werden per `instr()` gefiltert, Facetten und Top-Wirkungen in PHP b
 - **Design-Tokens** in `src/styles/tokens.css`: Rohwerte aus `design/tokens.json` (per Test synchron
   gehalten) plus semantische Tokens, die allein in Komponenten benutzt werden. Siehe [DESIGN.md](DESIGN.md).
 - **Assets** (Logos, Fotos, Favicon, App-Icon) werden direkt aus `design/assets/` importiert – eine Quelle, kein Kopieren.
+- **Installierbare App (PWA):** Vite-Plugin `scripts/pwa/plugin.ts` (Manifest, Service Worker), `features/pwa`,
+  Hinweise in `organisms/AppNotices`. `/api` wird nie gecacht. Siehe [PWA.md](PWA.md).
 - **Daten:** `api/client.ts` (CSRF, Fehler als `ApiError` mit Feldfehlern), `api/endpoints.ts`
   (typisiert), `hooks/useAsyncResource` (Laden + Race-Schutz), `hooks/useForm` (Formular +
   422-Feldfehler)

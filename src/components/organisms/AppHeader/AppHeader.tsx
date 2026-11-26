@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router';
+import { NavLink, useLocation } from 'react-router';
 import { useSession } from '../../../features/session/sessionContext';
 import { Icon, type IconName } from '../../atoms/Icon/Icon';
 import { IconButton } from '../../atoms/IconButton/IconButton';
 import { Logo } from '../../atoms/Logo/Logo';
+import { AccountMenu } from './AccountMenu';
 import styles from './AppHeader.module.css';
 
 interface NavItem {
@@ -13,43 +14,41 @@ interface NavItem {
   end?: boolean;
 }
 
-function initials(name: string | undefined): string {
-  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
-  return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '')).toUpperCase() || '?';
-}
+type OpenMenu = 'nav' | 'account' | null;
 
-/** Kopfzeile nach dem Login (Screendesign Sortenkatalog): Navigation, Konto-Menü, mobil Burger. */
+/**
+ * Kopfzeile nach dem Login (Screendesign Sorte & Bewertung): Desktop einzeilig, Tablet mit
+ * Navigation in zweiter Zeile, Handy mit Burger. Das Konto hängt überall am Initialen-Kreis.
+ */
 export function AppHeader() {
-  const { user, logout } = useSession();
-  const navigate = useNavigate();
+  const { user } = useSession();
   const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
+  const headerRef = useRef<HTMLElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
+  const burgerRef = useRef<HTMLDivElement>(null);
 
   const links: NavItem[] = [
     { to: '/', label: 'Sortenkatalog', icon: 'compass', end: true },
     { to: '/bewertungen', label: 'Journal', icon: 'book' },
-    { to: '/neuigkeiten', label: 'Neuigkeiten', icon: 'users' },
-    ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Verwaltung', icon: 'shield' as const }] : []),
+    { to: '/neuigkeiten', label: 'Neuigkeiten', icon: 'news' },
+    ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Verwaltung', icon: 'settings' as const }] : []),
   ];
 
   // Menüs schließen beim Seitenwechsel, Escape und Klick daneben
-  useEffect(() => {
-    setMenuOpen(false);
-    setAccountOpen(false);
-  }, [location.pathname]);
+  useEffect(() => setOpenMenu(null), [location.pathname]);
 
   useEffect(() => {
-    if (!menuOpen && !accountOpen) return undefined;
+    if (openMenu === null) return undefined;
+    const root = openMenu === 'account' ? accountRef.current : headerRef.current;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setMenuOpen(false);
-        setAccountOpen(false);
-      }
+      if (e.key !== 'Escape') return;
+      setOpenMenu(null);
+      // Fokus zurück auf den Auslöser, damit er nicht mit dem Menü verschwindet
+      (openMenu === 'account' ? accountRef : burgerRef).current?.querySelector('button')?.focus();
     };
     const onClick = (e: MouseEvent) => {
-      if (accountRef.current && !accountRef.current.contains(e.target as Node)) setAccountOpen(false);
+      if (!root?.contains(e.target as Node)) setOpenMenu(null);
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('click', onClick);
@@ -57,27 +56,25 @@ export function AppHeader() {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('click', onClick);
     };
-  }, [menuOpen, accountOpen]);
+  }, [openMenu]);
 
-  const onLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
+  const toggle = (menu: 'nav' | 'account') => setOpenMenu(openMenu === menu ? null : menu);
+  const navOpen = openMenu === 'nav';
 
   const navLinks = links.map((link) => (
-    <NavLink key={link.to} to={link.to} end={link.end}
+    <NavLink key={link.to} to={link.to} end={link.end} onClick={() => setOpenMenu(null)}
       className={({ isActive }) => {
         // Sortendetails gehören zum Katalog
         const active = isActive || (link.to === '/' && location.pathname.startsWith('/sorten/'));
         return `${styles.link} ${active ? styles.active : ''}`;
       }}>
-      <Icon name={link.icon} size={18} />
+      <Icon name={link.icon} size={20} />
       {link.label}
     </NavLink>
   ));
 
   return (
-    <header className={styles.header}>
+    <header className={styles.header} ref={headerRef}>
       <a href="#inhalt" className={styles.skip}>Zum Inhalt springen</a>
       <div className={styles.inner}>
         <NavLink to="/" className={styles.brand} aria-label="KrautKompass – zum Sortenkatalog">
@@ -87,42 +84,17 @@ export function AppHeader() {
         <nav className={styles.nav} aria-label="Hauptnavigation">{navLinks}</nav>
 
         <div className={styles.account} ref={accountRef}>
-          <button type="button" className={styles.accountButton} aria-expanded={accountOpen} aria-haspopup="true"
-            onClick={() => setAccountOpen(!accountOpen)}>
-            <span className={styles.avatar} aria-hidden="true">{initials(user?.display_name)}</span>
-            <span className={styles.srOnly}>Konto von {user?.display_name}</span>
-            <Icon name="chevronDown" size={16} />
-          </button>
-          {accountOpen && (
-            <div className={styles.accountMenu}>
-              <p className={styles.accountName}>{user?.display_name}</p>
-              <p className={styles.accountMail}>{user?.email}</p>
-              <button type="button" className={styles.menuAction} onClick={onLogout}>
-                <Icon name="logOut" size={18} /> Abmelden
-              </button>
-            </div>
-          )}
+          <AccountMenu open={openMenu === 'account'} onToggle={() => toggle('account')} />
         </div>
 
-        <IconButton icon={menuOpen ? 'x' : 'menu'} label={menuOpen ? 'Menü schließen' : 'Menü öffnen'}
-          aria-expanded={menuOpen} aria-controls="mobile-menu" className={styles.burger}
-          onClick={() => setMenuOpen(!menuOpen)} />
+        <div className={styles.burger} ref={burgerRef}>
+          <IconButton icon={navOpen ? 'x' : 'menu'} label={navOpen ? 'Menü schließen' : 'Menü öffnen'}
+            aria-expanded={navOpen} aria-controls="mobile-menu" onClick={() => toggle('nav')} />
+        </div>
       </div>
 
-      {menuOpen && (
-        <div id="mobile-menu" className={styles.mobileMenu}>
-          <nav aria-label="Hauptnavigation mobil" className={styles.mobileNav}>{navLinks}</nav>
-          <div className={styles.mobileUser}>
-            <span className={styles.avatar} aria-hidden="true">{initials(user?.display_name)}</span>
-            <span className={styles.mobileUserText}>
-              <strong>{user?.display_name}</strong>
-              <span>{user?.email}</span>
-            </span>
-          </div>
-          <button type="button" className={styles.menuAction} onClick={onLogout}>
-            <Icon name="logOut" size={18} /> Abmelden
-          </button>
-        </div>
+      {navOpen && (
+        <nav id="mobile-menu" aria-label="Hauptnavigation mobil" className={styles.mobileMenu}>{navLinks}</nav>
       )}
     </header>
   );

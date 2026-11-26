@@ -1,0 +1,73 @@
+.thumb {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  object-fit: contain;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  mix-blend-mode: multiply; /* weißer Foto-Hintergrund wird zur Kopfzeilenfläche */
+}
+
+.footer {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* Noch keine Gesamtbewertung: zurückgenommen, aber lesbar. Antippen zeigt, was fehlt. */
+.incomplete,
+.incomplete:hover:not(:disabled) {
+  background: var(--color-surface-alt);
+  border-color: var(--color-border-control);
+  color: var(--color-text-muted);
+}
+
+.delete {
+  margin-top: var(--space-5);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.saved {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--space-3);
+  min-height: 320px;
+  height: 100%;
+  text-align: center;
+}
+
+.savedIcon {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 45%, var(--color-background));
+  color: var(--color-primary);
+  animation: pop var(--duration-base) var(--ease-out);
+}
+
+.savedIcon svg {
+  width: 44px;
+  height: 44px;
+}
+
+.savedTitle {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  outline: none;
+}
+
+.savedText {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+}

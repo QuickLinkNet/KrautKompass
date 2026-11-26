@@ -1,6 +1,6 @@
 import { api } from './client';
 import type {
-  Facets, Invite, Meta, Paginated, Product, ProductDetails, Rating, RatingInput, Role, SyncRun, SystemStatus, User,
+  Facets, GroupSummary, Invite, Meta, Paginated, Product, ProductDetails, Rating, RatingInput, Role, SyncRun, SystemStatus, User,
 } from './types';
 
 type UserResponse = { user: User; csrfToken: string };
@@ -47,6 +47,13 @@ export interface ProductQuery {
   perPage?: number;
 }
 
+export interface ProductDetailResponse {
+  product: ProductDetails;
+  summary: GroupSummary;
+  myRating: Rating | null;
+  ratings: Rating[];
+}
+
 export const productApi = {
   list: ({ effects, ...query }: ProductQuery) =>
     api.get<Paginated<Product>>('/products', { ...query, effects: effects?.length ? effects.join(',') : undefined }),
@@ -56,7 +63,7 @@ export const productApi = {
       : api.delete<{ favorite: boolean }>(`/products/${id}/favorite`),
   facets: () => api.get<Facets>('/products/facets'),
   show: (id: number) =>
-    api.get<{ product: ProductDetails; myRating: Rating | null; ratings: Rating[] }>(`/products/${id}`),
+    api.get<ProductDetailResponse>(`/products/${id}`),
   rate: (id: number, input: RatingInput) => api.put<{ rating: Rating }>(`/products/${id}/rating`, input),
   deleteRating: (id: number) => api.delete<void>(`/products/${id}/rating`),
 };
